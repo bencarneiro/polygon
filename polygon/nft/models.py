@@ -4,18 +4,18 @@ from django.db import models
 
 class SeaportTransaction(models.Model):
 
-    tx_hash = models.CharField(limit=100, blank=False, null=False)
-    method_name = models.CharField(limit=100, blank=False, null=False)
-    value = models.IntegerField(null=False, default=0, unsigned=True)
-    gas_price = models.IntegerField(null=False, default=0, unsigned=True)
-    gas_used = models.IntegerField(null=False, default=0, unsigned=True)
-    tx_fee = models.IntegerField(null=False, default=0, unsigned=True)
+    tx_hash = models.CharField(max_length=100, blank=False, null=False)
+    method_name = models.CharField(max_length=100, blank=False, null=False)
+    value = models.IntegerField(null=False, default=0)
+    gas_price = models.IntegerField(null=False, default=0)
+    gas_used = models.IntegerField(null=False, default=0)
+    tx_fee = models.IntegerField(null=False, default=0)
     tx_reciept_status = models.BooleanField(default=0)
     dt = models.DateTimeField(null=False, blank=False)
-    block_number = models.IntegerField(null=False, blank=False, unsigned=True)
+    block_number = models.PositiveIntegerField(null=False, blank=False)
     is_error = models.BooleanField(default=0)
-    to_address = models.CharField(limit=100, blank=False, null=False)
-    from_address = models.CharField(limit=100, blank=False, null=False)
+    to_address = models.CharField(max_length=100, blank=False, null=False)
+    from_address = models.CharField(max_length=100, blank=False, null=False)
 
     class Meta:
         managed = True
