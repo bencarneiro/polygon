@@ -47,7 +47,7 @@ class Command(BaseCommand):
                     is_error = tx['isError'],
                     to_address = tx['to'],
                     from_address = tx['from'],
-                    token_contract_address = token_contract_address
+                    token_contract_address = token_contract_address,
                     token_id = token_id
                 )
                 new_tx.save()
