@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from web3 import Web3
-from settings import INFURA_RPC_URL, POLYGONSCAN_API_KEY, SEAPORT_CONTRACT_ABI
+from polygon.settings import INFURA_RPC_URL, POLYGONSCAN_API_KEY, SEAPORT_CONTRACT_ABI
 web3 = Web3(Web3.HTTPProvider(INFURA_RPC_URL))
 from web3.middleware import geth_poa_middleware
 web3.middleware_onion.inject(geth_poa_middleware, layer=0)
