@@ -27,9 +27,11 @@ class Command(BaseCommand):
         parser.add_argument('end_block', type=int, help='Stop Scraping Transactions when this block # is reached')
 
     def handle(self, *args, **kwargs):
-        resp = requests.get('https://api.polygonscan.com/api?module=account&action=txlist&address=0x00000000006c3852cbEf3e08E8dF289169EdE581&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=CC75ZX7TC9GHD7IC3NF6S222GHCYREI1CJ')
+        resp = requests.get('https://api.polygonscan.com/api?module=account&action=txlist&address=0x00000000006c3852cbEf3e08E8dF289169EdE581&startblock=39700000&endblock=39749185&page=1&offset=100&sort=asc&apikey=CC75ZX7TC9GHD7IC3NF6S222GHCYREI1CJ')
         seaport_txs = resp.json()
+        print(seaport_txs)
         for tx in seaport_txs['result']:
+            print(tx['functionName'])
             if tx['functionName'] == "fulfillBasicOrder(tuple)": 
                 print(tx)
                 function_input_params = seaport.decode_function_input(tx['input'])[1]['parameters']
