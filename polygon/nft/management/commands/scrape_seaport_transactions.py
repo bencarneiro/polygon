@@ -60,6 +60,23 @@ class Command(BaseCommand):
                         tx_input=tx['input']
                     )
                     new_tx.save()
+                else:
+                    new_tx = SeaportTransaction(
+                        tx_hash = tx['hash'],
+                        method_name = tx['functionName'],
+                        value = tx['value'],
+                        gas_price = int(tx['gasPrice']),
+                        gas_used = int(tx['gasUsed']),
+                        tx_fee = int(tx['gasUsed']) * int(tx['gasPrice']),
+                        tx_reciept_status = tx['txreceipt_status'],
+                        dt = datetime.fromtimestamp(int(tx['timeStamp'])),
+                        block_number = tx['blockNumber'],
+                        is_error = tx['isError'],
+                        to_address = tx['to'],
+                        from_address = tx['from'],
+                        tx_input=tx['input']
+                    )
+                    new_tx.save()
             if len(seaport_txs['result']) == 1000:
                 more = True
                 page += 1
