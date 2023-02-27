@@ -32,8 +32,9 @@ class Command(BaseCommand):
         for tx in seaport_txs['result']:
             if tx['functionName'] == "fulfillBasicOrder(tuple)": 
                 print(tx)
-                token_contract_address = seaport.decode_function_input(tx['input'])[1]['parameters'][5]
-                token_id = seaport.decode_function_input(tx['input'])[1]['parameters'][6]
+                function_input_params = seaport.decode_function_input(tx['input'])[1]['parameters']
+                token_contract_address = function_input_params[5]
+                token_id = function_input_params[6]
                 new_tx = SeaportTransaction(
                     tx_hash = tx['hash'],
                     method_name = tx['functionName'],
@@ -42,13 +43,14 @@ class Command(BaseCommand):
                     gas_used = int(tx['gasUsed']),
                     tx_fee = int(tx['gasUsed']) * int(tx['gasPrice']),
                     tx_reciept_status = tx['txreceipt_status'],
-                    dt = datetime.utc_now(), # todo this is tempcode to make it run
+                    dt = datetime.fromtimestamp(int(tx['timeStamp'])),
                     block_number = tx['blockNumber'],
                     is_error = tx['isError'],
                     to_address = tx['to'],
                     from_address = tx['from'],
                     token_contract_address = token_contract_address,
-                    token_id = token_id
+                    token_id = token_id,
+                    tx_input=tx['input']
                 )
                 new_tx.save()
         # time = timezone.now().strftime('%X')

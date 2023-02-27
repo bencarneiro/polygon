@@ -6,10 +6,10 @@ class SeaportTransaction(models.Model):
 
     tx_hash = models.CharField(max_length=100, blank=False, null=False)
     method_name = models.CharField(max_length=100, blank=False, null=False)
-    value = models.IntegerField(null=False, default=0)
-    gas_price = models.IntegerField(null=False, default=0)
-    gas_used = models.IntegerField(null=False, default=0)
-    tx_fee = models.IntegerField(null=False, default=0)
+    value = models.BigIntegerField(null=False, default=0)
+    gas_price = models.BigIntegerField(null=False, default=0)
+    gas_used = models.BigIntegerField(null=False, default=0)
+    tx_fee = models.BigIntegerField(null=False, default=0)
     tx_reciept_status = models.BooleanField(default=0)
     dt = models.DateTimeField(null=False, blank=False)
     block_number = models.PositiveIntegerField(null=False, blank=False)
@@ -18,6 +18,7 @@ class SeaportTransaction(models.Model):
     from_address = models.CharField(max_length=100, blank=False, null=False)
     token_contract_address = models.CharField(max_length=100, blank=True, null=True)
     token_id = models.CharField(max_length=100, blank=True, null=True)
+    tx_input = models.TextField(null=True)
 
     class Meta:
         managed = True
