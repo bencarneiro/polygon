@@ -5,7 +5,7 @@ from django.db import models
 class SeaportTransaction(models.Model):
 
     tx_hash = models.CharField(max_length=100, blank=False, null=False)
-    method_name = models.CharField(max_length=100, blank=False, null=False)
+    method_name = models.CharField(max_length=256, blank=False, null=False)
     value = models.DecimalField( max_digits=65, decimal_places=0)
     gas_price = models.BigIntegerField(null=False, default=0)
     gas_used = models.BigIntegerField(null=False, default=0)
