@@ -73,6 +73,7 @@ class Command(BaseCommand):
                     function_input_params = seaport.decode_function_input(tx['input'])[1]['parameters']
                     token_contract_address = function_input_params[5]
                     token_id = function_input_params[6]
+                    tx_volumes = determine_volumes(tx['hash'])
                     new_tx = SeaportTransaction(
                         tx_hash = tx['hash'],
                         method_name = tx['functionName'],
@@ -88,10 +89,12 @@ class Command(BaseCommand):
                         from_address = tx['from'],
                         token_contract_address = token_contract_address,
                         token_id = token_id,
-                        tx_input=tx['input']
+                        tx_input=tx['input'],
+                        volumes=tx_volumes
                     )
                     new_tx.save()
                 else:
+                    tx_volumes = determine_volumes(tx['hash'])
                     new_tx = SeaportTransaction(
                         tx_hash = tx['hash'],
                         method_name = tx['functionName'],
@@ -105,7 +108,8 @@ class Command(BaseCommand):
                         is_error = tx['isError'],
                         to_address = tx['to'],
                         from_address = tx['from'],
-                        tx_input=tx['input']
+                        tx_input=tx['input'],
+                        volumes=tx_volumes
                     )
                     new_tx.save()
             if len(seaport_txs['result']) == 1000:
