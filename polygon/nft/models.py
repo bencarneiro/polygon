@@ -16,8 +16,6 @@ class SeaportTransaction(models.Model):
     is_error = models.BooleanField(default=0)
     to_address = models.CharField(max_length=100, blank=False, null=False)
     from_address = models.CharField(max_length=100, blank=False, null=False)
-    token_contract_address = models.CharField(max_length=100, blank=True, null=True)
-    token_id = models.CharField(max_length=100, blank=True, null=True)
     volumes = models.TextField(null=True)
 
     class Meta:
