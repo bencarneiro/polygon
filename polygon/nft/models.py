@@ -46,7 +46,7 @@ class Seaport1155Transaction(models.Model):
     tx_hash = models.CharField(max_length=100, blank=False, null=False)
     contract_address = models.CharField(max_length=100, blank=True, null=True)
     token_id = models.CharField(max_length=100, blank=True, null=True)
-    quantity = models.BigIntegerField(blank=False, null=False)
+    quantity = models.DecimalField( max_digits=65, decimal_places=0)
     matic_price = models.DecimalField( max_digits=65, decimal_places=0)
     usdc_price = models.DecimalField( max_digits=65, decimal_places=0)
     weth_price = models.DecimalField( max_digits=65, decimal_places=0)
