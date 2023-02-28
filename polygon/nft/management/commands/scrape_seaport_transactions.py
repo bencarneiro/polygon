@@ -41,67 +41,132 @@ def determine_volumes(tx_hash):
                     tx = {'type': "ERC20", "from": "0x" + str(web3.toHex(log['topics'][1]))[26:], "to": "0x" + str(web3.toHex(log['topics'][2]))[26:], "amount": web3.toInt(hexstr=log['data'][2:66]), 'contract_address': log['address']}
                 transfers += [tx]
         if web3.toHex(log['topics'][0]) == "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62":
-            tx = {"type": "ERC1155", "from": "0x" + str(web3.toHex(log['topics'][2]))[26:], 'to': "0x" + str(web3.toHex(log['topics'][3]))[26:], 'token_id': web3.toInt(hexstr=log['data'][2:66]), 'quantity': web3.toInt(hexstr=log['data'][66:130])}
+            tx = {"type": "ERC1155", "from": "0x" + str(web3.toHex(log['topics'][2]))[26:], 'to': "0x" + str(web3.toHex(log['topics'][3]))[26:], "contract_address": log['address'], 'token_id': web3.toInt(hexstr=log['data'][2:66]), 'quantity': web3.toInt(hexstr=log['data'][66:130])}
             transfers += [tx]
     return transfers
 
-def analyze_volumes(tx_hash, transfers):
+def analyze_volumes(tx, transfers):
     buyer = None
     print(transfers)
+    nft_transfers_by_sender = {}
+
     for transfer in transfers:
-        print(transfer['to'])
+
         if (transfer['type'] == "ERC721") or (transfer['type'] == "ERC1155"):
-            buyer = transfer['to']
-            break
-    for transfer in transfers:
-        if transfer['type'] == "ERC721":
-            seller = transfer['from']
-            print(f"SCANNING FOR BUYER {buyer}")
-            print(f"SCANNING FOR SELLER {seller}")
-            contract_address = transfer['contract_address']
-            token_id = transfer['token_id']
-            for tfr in transfers:
-                print(tfr['type'])
-                print(tfr['to'])
-                print(seller)
-                print(tfr['from'])
-                print(SEAPORT_ADDRESS)
-                tx_to_write = False
-                if (tfr['type'] == "MATIC") and (tfr['to'] == seller) and (tfr['from'] == SEAPORT_ADDRESS):
-                    # todo this is not working
-                    print("MATICMATICMATICMATIC?")
-                    matic_price = tfr['amount']
-                    usdc_price = 0
-                    weth_price = 0
-                    spot_price = 0
-                    tx_to_write = True
-                if (tfr['type'] == "USDC") and (tfr['to'] == seller) and ((tfr['from'] == SEAPORT_ADDRESS) or (tfr['from'] == buyer)):
-                    print("YEAH?")
-                    matic_price = 0
-                    usdc_price = tfr['amount']
-                    weth_price = 0
-                    spot_price = 0
-                    tx_to_write = True
-                if (tfr['type'] == "WETH") and (tfr['to'] == seller) and ((tfr['from'] == SEAPORT_ADDRESS) or (tfr['from'] == buyer)):
-                    print("YEAH?")
-                    matic_price = 0
-                    usdc_price = 0
-                    weth_price = tfr['amount']
-                    spot_price = 0
-                    tx_to_write = True
-                if tx_to_write:
+            if transfer['from'] not in nft_transfers_by_sender:
+                nft_transfers_by_sender[transfer['from']] = {'nfts': [transfer], 'coins': []}
+            else:
+                nft_transfers_by_sender[transfer['from']]['nfts'] += [transfer]
+
+        if transfer['type'] in ['MATIC', "WETH", 'USDC']:
+            if transfer['to'] not in nft_transfers_by_sender:
+                nft_transfers_by_sender[transfer['to']] = {'nfts': [], 'coins': [transfer]}
+            else:
+                nft_transfers_by_sender[transfer['to']]['coins'] += [transfer]
+
+    # print(nft_transfers_by_sender)
+    for seller_address in nft_transfers_by_sender:
+
+        print(nft_transfers_by_sender[seller_address])
+        trading_activity = nft_transfers_by_sender[seller_address]
+
+        if len(trading_activity['coins']) > 0 and len(trading_activity['nfts']) > 0:
+
+            matic_price = 0
+            usdc_price = 0
+            weth_price = 0
+            spot_price = 0
+
+            for coin_transfer in trading_activity['coins']:
+                if coin_transfer['type'] == "MATIC":
+                    matic_price = coin_transfer['amount'] / len(trading_activity['nfts'])
+                if coin_transfer['type'] == "USDC":
+                    usdc_price = coin_transfer['amount'] / len(trading_activity['nfts'])
+                if coin_transfer['type'] == "WETH":
+                    weth_price = coin_transfer['amount'] / len(trading_activity['nfts'])
+
+            for nft_transfer in trading_activity['nfts']:
+                if nft_transfer['type'] == "ERC721":
                     new_721_tx = Seaport721Transaction(
-                        tx_hash = tx_hash,
-                        contract_address = contract_address,
-                        token_id = token_id,
+                        tx_hash = tx['hash'],
+                        contract_address = nft_transfer['contract_address'],
+                        token_id = nft_transfer['token_id'],
                         matic_price = matic_price,
                         usdc_price = usdc_price,
                         weth_price = weth_price,
                         spot_price = spot_price,
-                        buyer = buyer,
-                        seller = seller
+                        buyer = nft_transfer['to'],
+                        seller = seller_address
                     )
                     new_721_tx.save()
+
+                if nft_transfer['type'] == "ERC1155":
+                    new_1155_tx = Seaport1155Transaction(
+                        tx_hash = tx['hash'],
+                        contract_address = nft_transfer['contract_address'],
+                        token_id = nft_transfer['token_id'],
+                        quantity = nft_transfer['quantity'],
+                        matic_price = matic_price,
+                        usdc_price = usdc_price,
+                        weth_price = weth_price,
+                        spot_price = spot_price,
+                        buyer = nft_transfer['to'],
+                        seller = seller_address
+                    )
+                    new_1155_tx.save()
+
+
+
+    # for transfer in transfers:
+    #     if transfer['type'] == "ERC721":
+    #         seller = transfer['from']
+    #         print(f"SCANNING FOR BUYER {buyer}")
+    #         print(f"SCANNING FOR SELLER {seller}")
+    #         contract_address = transfer['contract_address']
+    #         token_id = transfer['token_id']
+    #         for tfr in transfers:
+    #             # print(tfr['type'])
+    #             # print(tfr['to'])
+    #             # print(seller)
+    #             # print(tfr['from'])
+    #             # print(SEAPORT_ADDRESS)
+    #             print(tfr)
+    #             tx_to_write = False
+    #             if (tfr['type'] == "MATIC") and (tfr['to'] == seller) and (tfr['from'] == SEAPORT_ADDRESS):
+    #                 # todo this is not working
+    #                 print("MATICMATICMATICMATIC?")
+    #                 matic_price = tfr['amount']
+    #                 usdc_price = 0
+    #                 weth_price = 0
+    #                 spot_price = 0
+    #                 tx_to_write = True
+    #             if (tfr['type'] == "USDC") and (tfr['to'] == seller) and ((tfr['from'] == SEAPORT_ADDRESS) or (tfr['from'] == buyer)):
+    #                 print("YEAH?")
+    #                 matic_price = 0
+    #                 usdc_price = tfr['amount']
+    #                 weth_price = 0
+    #                 spot_price = 0
+    #                 tx_to_write = True
+    #             if (tfr['type'] == "WETH") and (tfr['to'] == seller) and ((tfr['from'] == SEAPORT_ADDRESS) or (tfr['from'] == buyer)):
+    #                 print("YEAH?")
+    #                 matic_price = 0
+    #                 usdc_price = 0
+    #                 weth_price = tfr['amount']
+    #                 spot_price = 0
+    #                 tx_to_write = True
+    #             if tx_to_write:
+    #                 new_721_tx = Seaport721Transaction(
+    #                     tx_hash = tx['hash'],
+    #                     contract_address = contract_address,
+    #                     token_id = token_id,
+    #                     matic_price = matic_price,
+    #                     usdc_price = usdc_price,
+    #                     weth_price = weth_price,
+    #                     spot_price = spot_price,
+    #                     buyer = buyer,
+    #                     seller = seller
+    #                 )
+    #                 new_721_tx.save()
             
  
 
@@ -120,47 +185,24 @@ class Command(BaseCommand):
             resp = requests.get(polygon_scan_url)
             seaport_txs = resp.json()
             for tx in seaport_txs['result']:
-                if tx['functionName'] == "fulfillBasicOrder(tuple)": 
-                    function_input_params = seaport.decode_function_input(tx['input'])[1]['parameters']
-                    token_contract_address = function_input_params[5]
-                    token_id = function_input_params[6]
-                    tx_volumes = determine_volumes(tx['hash'])
-                    analyze_volumes(tx['hash'], tx_volumes)
-                    new_tx = SeaportTransaction(
-                        tx_hash = tx['hash'],
-                        method_name = tx['functionName'],
-                        value = tx['value'],
-                        gas_price = int(tx['gasPrice']),
-                        gas_used = int(tx['gasUsed']),
-                        tx_fee = int(tx['gasUsed']) * int(tx['gasPrice']),
-                        tx_reciept_status = tx['txreceipt_status'],
-                        dt = datetime.fromtimestamp(int(tx['timeStamp'])),
-                        block_number = tx['blockNumber'],
-                        is_error = tx['isError'],
-                        to_address = tx['to'],
-                        from_address = tx['from'],
-                        volumes=tx_volumes
-                    )
-                    new_tx.save()
-                else:
-                    tx_volumes = determine_volumes(tx['hash'])
-                    analyze_volumes(tx['hash'], tx_volumes)
-                    new_tx = SeaportTransaction(
-                        tx_hash = tx['hash'],
-                        method_name = tx['functionName'],
-                        value = tx['value'],
-                        gas_price = int(tx['gasPrice']),
-                        gas_used = int(tx['gasUsed']),
-                        tx_fee = int(tx['gasUsed']) * int(tx['gasPrice']),
-                        tx_reciept_status = tx['txreceipt_status'],
-                        dt = datetime.fromtimestamp(int(tx['timeStamp'])),
-                        block_number = tx['blockNumber'],
-                        is_error = tx['isError'],
-                        to_address = tx['to'],
-                        from_address = tx['from'],
-                        volumes=tx_volumes
-                    )
-                    new_tx.save()
+                tx_volumes = determine_volumes(tx['hash'])
+                analyze_volumes(tx, tx_volumes)
+                new_tx = SeaportTransaction(
+                    tx_hash = tx['hash'],
+                    method_name = tx['functionName'],
+                    value = tx['value'],
+                    gas_price = int(tx['gasPrice']),
+                    gas_used = int(tx['gasUsed']),
+                    tx_fee = int(tx['gasUsed']) * int(tx['gasPrice']),
+                    tx_reciept_status = tx['txreceipt_status'],
+                    dt = datetime.fromtimestamp(int(tx['timeStamp'])),
+                    block_number = tx['blockNumber'],
+                    is_error = tx['isError'],
+                    to_address = tx['to'],
+                    from_address = tx['from'],
+                    volumes=tx_volumes
+                )
+                new_tx.save()
             if len(seaport_txs['result']) == 1000:
                 more = True
                 page += 1
