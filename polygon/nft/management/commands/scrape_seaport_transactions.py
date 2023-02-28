@@ -43,6 +43,11 @@ def determine_volumes(tx_hash):
                     transfers[log['address']] = web3.toInt(hexstr=log['data'][2:66])
                 elif web3.toInt(hexstr=log['data'][2:66]) > transfers[log['address']]:
                     transfers[log['address']] = web3.toInt(hexstr=log['data'][2:66])
+        if web3.toHex(log['topics'][0]) == "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62":
+            if log['address'] not in transfers:
+                transfers[log['address']] = [(web3.toInt(hexstr=log['data'][2:66]), web3.toInt(hexstr=log['data'][66:130]))]
+            else: 
+                transfers[log['address']] += [(web3.toInt(hexstr=log['data'][2:66]), web3.toInt(hexstr=log['data'][66:130]))]
     return transfers
  
 
