@@ -22,32 +22,27 @@ seaport = web3.eth.contract(address="0x00000000006c3852cbEf3e08E8dF289169EdE581"
 # https://github.com/dsgriffin/nft-sales-twitter-bot/blob/master/app.js
 
 def determine_volumes(tx_hash):
-    # random trump transaction
-
     rct = web3.eth.get_transaction_receipt(tx_hash)
-    transfers = {}
+    transfers = []
     for log in rct['logs']:
         if web3.toHex(log['topics'][0]) == "0xe6497e3ee548a3372136af2fcb0696db31fc6cf20260707645068bd3fe97f3c4":
-            if not "matic" in transfers:
-                transfers['matic'] = web3.toInt(hexstr=log['data'][2:66])
-            elif web3.toInt(hexstr=log['data'][2:66]) > transfers['matic']:
-                transfers['matic'] = web3.toInt(hexstr=log['data'][2:66])
+            tx = {"type": "MATIC", 'from': "0x" + str(web3.toHex(log['topics'][2])[26:]), 'to': "0x" + str(web3.toHex(log['topics'][3])[26:]), "amount": web3.toInt(hexstr=log['data'][2:66])}
+            transfers += [tx]
         if web3.toHex(log['topics'][0]) == "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef":
             if len(log['topics']) == 4:
-                if log['address'] not in transfers:
-                    transfers[log['address']] = [web3.toInt(log['topics'][3])]
-                else:
-                    transfers[log['address']] += [web3.toInt(log['topics'][3])]
+                tx = {"type": "ERC721", "from": "0x" + str(web3.toHex(log['topics'][1]))[26:], "to": "0x" + str(web3.toHex(log['topics'][2]))[26:], "contract_address": log['address'], "token_id": web3.toInt(log['topics'][3])}
+                transfers += [tx]
             if len(log['topics']) == 3:
-                if log['address'] not in transfers:
-                    transfers[log['address']] = web3.toInt(hexstr=log['data'][2:66])
-                elif web3.toInt(hexstr=log['data'][2:66]) > transfers[log['address']]:
-                    transfers[log['address']] = web3.toInt(hexstr=log['data'][2:66])
+                if log['address'] == "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619":
+                    tx = {'type': "WETH", "from": "0x" + str(web3.toHex(log['topics'][1]))[26:], "to": "0x" + str(web3.toHex(log['topics'][2]))[26:], "amount": web3.toInt(hexstr=log['data'][2:66])}
+                elif log['address'] == "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174":
+                    tx = {'type': "USDC", "from": "0x" + str(web3.toHex(log['topics'][1]))[26:], "to": "0x" + str(web3.toHex(log['topics'][2]))[26:], "amount": web3.toInt(hexstr=log['data'][2:66])}
+                else:
+                    tx = {'type': "ERC20", "from": "0x" + str(web3.toHex(log['topics'][1]))[26:], "to": "0x" + str(web3.toHex(log['topics'][2]))[26:], "amount": web3.toInt(hexstr=log['data'][2:66]), 'contract_address': log['address']}
+                transfers += [tx]
         if web3.toHex(log['topics'][0]) == "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62":
-            if log['address'] not in transfers:
-                transfers[log['address']] = [(web3.toInt(hexstr=log['data'][2:66]), web3.toInt(hexstr=log['data'][66:130]))]
-            else: 
-                transfers[log['address']] += [(web3.toInt(hexstr=log['data'][2:66]), web3.toInt(hexstr=log['data'][66:130]))]
+            tx = {"type": "ERC1155", "from": "0x" + str(web3.toHex(log['topics'][2]))[26:], 'to': "0x" + str(web3.toHex(log['topics'][3]))[26:], 'token_id': web3.toInt(hexstr=log['data'][2:66]), 'quantity': web3.toInt(hexstr=log['data'][66:130])}
+            transfers += [tx]
     return transfers
  
 
@@ -89,7 +84,6 @@ class Command(BaseCommand):
                         from_address = tx['from'],
                         token_contract_address = token_contract_address,
                         token_id = token_id,
-                        tx_input=tx['input'],
                         volumes=tx_volumes
                     )
                     new_tx.save()
@@ -108,7 +102,6 @@ class Command(BaseCommand):
                         is_error = tx['isError'],
                         to_address = tx['to'],
                         from_address = tx['from'],
-                        tx_input=tx['input'],
                         volumes=tx_volumes
                     )
                     new_tx.save()
