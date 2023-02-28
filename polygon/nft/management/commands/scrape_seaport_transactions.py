@@ -43,7 +43,6 @@ def determine_volumes(tx_hash):
                     transfers[log['address']] = web3.toInt(hexstr=log['data'][2:66])
                 elif web3.toInt(hexstr=log['data'][2:66]) > transfers[log['address']]:
                     transfers[log['address']] = web3.toInt(hexstr=log['data'][2:66])
-                transfers['matic'] = web3.toInt(hexstr=log['data'][2:66])
     return transfers
  
 
