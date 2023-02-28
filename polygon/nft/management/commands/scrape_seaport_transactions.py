@@ -10,7 +10,7 @@ from polygon.settings import INFURA_RPC_URL, POLYGONSCAN_API_KEY, SEAPORT_CONTRA
 web3 = Web3(Web3.HTTPProvider(INFURA_RPC_URL))
 from web3.middleware import geth_poa_middleware
 web3.middleware_onion.inject(geth_poa_middleware, layer=0)
-from nft.models import SeaportTransaction
+from nft.models import SeaportTransaction, Seaport1155Transaction, Seaport721Transaction
 from datetime import datetime
 
 import requests
@@ -44,6 +44,65 @@ def determine_volumes(tx_hash):
             tx = {"type": "ERC1155", "from": "0x" + str(web3.toHex(log['topics'][2]))[26:], 'to': "0x" + str(web3.toHex(log['topics'][3]))[26:], 'token_id': web3.toInt(hexstr=log['data'][2:66]), 'quantity': web3.toInt(hexstr=log['data'][66:130])}
             transfers += [tx]
     return transfers
+
+def analyze_volumes(tx_hash, transfers):
+    buyer = None
+    print(transfers)
+    for transfer in transfers:
+        print(transfer['to'])
+        if (transfer['type'] == "ERC721") or (transfer['type'] == "ERC1155"):
+            buyer = transfer['to']
+            break
+    for transfer in transfers:
+        if transfer['type'] == "ERC721":
+            seller = transfer['from']
+            print(f"SCANNING FOR BUYER {buyer}")
+            print(f"SCANNING FOR SELLER {seller}")
+            contract_address = transfer['contract_address']
+            token_id = transfer['token_id']
+            for tfr in transfers:
+                print(tfr['type'])
+                print(tfr['to'])
+                print(seller)
+                print(tfr['from'])
+                print(SEAPORT_ADDRESS)
+                tx_to_write = False
+                if (tfr['type'] == "MATIC") and (tfr['to'] == seller) and (tfr['from'] == SEAPORT_ADDRESS):
+                    # todo this is not working
+                    print("MATICMATICMATICMATIC?")
+                    matic_price = tfr['amount']
+                    usdc_price = 0
+                    weth_price = 0
+                    spot_price = 0
+                    tx_to_write = True
+                if (tfr['type'] == "USDC") and (tfr['to'] == seller) and ((tfr['from'] == SEAPORT_ADDRESS) or (tfr['from'] == buyer)):
+                    print("YEAH?")
+                    matic_price = 0
+                    usdc_price = tfr['amount']
+                    weth_price = 0
+                    spot_price = 0
+                    tx_to_write = True
+                if (tfr['type'] == "WETH") and (tfr['to'] == seller) and ((tfr['from'] == SEAPORT_ADDRESS) or (tfr['from'] == buyer)):
+                    print("YEAH?")
+                    matic_price = 0
+                    usdc_price = 0
+                    weth_price = tfr['amount']
+                    spot_price = 0
+                    tx_to_write = True
+                if tx_to_write:
+                    new_721_tx = Seaport721Transaction(
+                        tx_hash = tx_hash,
+                        contract_address = contract_address,
+                        token_id = token_id,
+                        matic_price = matic_price,
+                        usdc_price = usdc_price,
+                        weth_price = weth_price,
+                        spot_price = spot_price,
+                        buyer = buyer,
+                        seller = seller
+                    )
+                    new_721_tx.save()
+            
  
 
 class Command(BaseCommand):
@@ -60,15 +119,13 @@ class Command(BaseCommand):
             polygon_scan_url = f"https://api.polygonscan.com/api?module=account&action=txlist&address={SEAPORT_ADDRESS}&startblock={kwargs['start_block']}&endblock={kwargs['end_block']}&page={page}&offset=1000&sort=asc&apikey={POLYGONSCAN_API_KEY}"
             resp = requests.get(polygon_scan_url)
             seaport_txs = resp.json()
-            print(seaport_txs)
             for tx in seaport_txs['result']:
-                print(tx['functionName'])
                 if tx['functionName'] == "fulfillBasicOrder(tuple)": 
-                    print(tx)
                     function_input_params = seaport.decode_function_input(tx['input'])[1]['parameters']
                     token_contract_address = function_input_params[5]
                     token_id = function_input_params[6]
                     tx_volumes = determine_volumes(tx['hash'])
+                    analyze_volumes(tx['hash'], tx_volumes)
                     new_tx = SeaportTransaction(
                         tx_hash = tx['hash'],
                         method_name = tx['functionName'],
@@ -87,6 +144,7 @@ class Command(BaseCommand):
                     new_tx.save()
                 else:
                     tx_volumes = determine_volumes(tx['hash'])
+                    analyze_volumes(tx['hash'], tx_volumes)
                     new_tx = SeaportTransaction(
                         tx_hash = tx['hash'],
                         method_name = tx['functionName'],
