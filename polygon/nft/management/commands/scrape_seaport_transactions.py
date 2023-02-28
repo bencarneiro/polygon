@@ -18,7 +18,34 @@ import requests
 seaport = web3.eth.contract(address="0x00000000006c3852cbEf3e08E8dF289169EdE581", abi=SEAPORT_CONTRACT_ABI)
 
 
-# def write_transactions()
+# here is an example of someone doing this for a twitter bot in js
+# https://github.com/dsgriffin/nft-sales-twitter-bot/blob/master/app.js
+
+def determine_volumes(tx_hash):
+    # random trump transaction
+
+    rct = web3.eth.get_transaction_receipt(tx_hash)
+    transfers = {}
+    for log in rct['logs']:
+        if web3.toHex(log['topics'][0]) == "0xe6497e3ee548a3372136af2fcb0696db31fc6cf20260707645068bd3fe97f3c4":
+            if not "matic" in transfers:
+                transfers['matic'] = web3.toInt(hexstr=log['data'][2:66])
+            elif web3.toInt(hexstr=log['data'][2:66]) > transfers['matic']:
+                transfers['matic'] = web3.toInt(hexstr=log['data'][2:66])
+        if web3.toHex(log['topics'][0]) == "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef":
+            if len(log['topics']) == 4:
+                if log['address'] not in transfers:
+                    transfers[log['address']] = [web3.toInt(log['topics'][3])]
+                else:
+                    transfers[log['address']] += [web3.toInt(log['topics'][3])]
+            if len(log['topics']) == 3:
+                if log['address'] not in transfers:
+                    transfers[log['address']] = web3.toInt(hexstr=log['data'][2:66])
+                elif web3.toInt(hexstr=log['data'][2:66]) > transfers[log['address']]:
+                    transfers[log['address']] = web3.toInt(hexstr=log['data'][2:66])
+                transfers['matic'] = web3.toInt(hexstr=log['data'][2:66])
+    return transfers
+ 
 
 class Command(BaseCommand):
     help = 'Displays current time'
