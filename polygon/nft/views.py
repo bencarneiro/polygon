@@ -16,29 +16,30 @@ def get_transactions(request):
     # these filters are run on the main tx table
 
     if "start_dt" in request.GET:
-        q &= Q(dt__gte=datetime.fromtimestamp(int(request.GET['start_dt'])))
+        q &= Q(tx_hash__dt__gte=datetime.fromtimestamp(int(request.GET['start_dt'])))
     if "end_dt" in request.GET:
-        q &= Q(dt__lte=datetime.fromtimestamp(int(request.GET['end_dt'])))
+        q &= Q(tx_hash__dt__lte=datetime.fromtimestamp(int(request.GET['end_dt'])))
     if "start_block" in request.GET:
-        q &= Q(block_number__gte=request.GET['start_block'])
+        q &= Q(tx_hash__block_number__gte=request.GET['start_block'])
     if "end_block" in request.GET:
-        q &= Q(block_number__lte=request.GET['end_block'])
+        q &= Q(tx_hash__block_number__lte=request.GET['end_block'])
 
     # these filters are run on the subtable
     if "buyer" in request.GET:
         y &= Q(buyer=request.GET['buyer'])
     if "seller" in request.GET:
-        y &= Q(buyer=request.GET['seller'])
+        y &= Q(seller=request.GET['seller'])
     if "contract_address" in request.GET:
          y &= Q(contract_address=request.GET['contract_address'])
     if "token_id" in request.GET:
         y &= Q(token_id=request.GET['token_id'])
 
-    data = SeaportTransaction.objects.filter(q)
-    joined_data = data.prefetch_related('seaport_721_transaction')
+    data721 = Seaport1155Transaction.objects.filter(q)
+    data1155 = Seaport721Transaction.objects.filter(q)
+    
     response = {
         'status': "success",
-        "data": list(joined_data.values())
+        "data": list(data721.values()) + list(data1155.values())
     }
     return JsonResponse(response)
     

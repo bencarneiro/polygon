@@ -24,7 +24,7 @@ class SeaportTransaction(models.Model):
 
 class Seaport721Transaction(models.Model):
 
-    tx_hash = models.CharField(max_length=100, blank=False, null=False)
+    tx_hash = models.ForeignKey(SeaportTransaction, on_delete=models.DO_NOTHING)
     contract_address = models.CharField(max_length=100, blank=True, null=True)
     token_id = models.CharField(max_length=100, blank=True, null=True)
     matic_price = models.DecimalField( max_digits=65, decimal_places=0)
@@ -43,7 +43,7 @@ class Seaport721Transaction(models.Model):
 
 class Seaport1155Transaction(models.Model):
 
-    tx_hash = models.CharField(max_length=100, blank=False, null=False)
+    tx_hash = models.ForeignKey(SeaportTransaction, on_delete=models.DO_NOTHING)
     contract_address = models.CharField(max_length=100, blank=True, null=True)
     token_id = models.CharField(max_length=100, blank=True, null=True)
     quantity = models.DecimalField( max_digits=65, decimal_places=0)
