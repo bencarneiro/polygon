@@ -34,12 +34,13 @@ def get_transactions(request):
     if "token_id" in request.GET:
         y &= Q(token_id=request.GET['token_id'])
 
-    data721 = Seaport1155Transaction.objects.filter(q)
-    data1155 = Seaport721Transaction.objects.filter(q)
+    data721 = Seaport721Transaction.objects.filter(q)
+    data1155 = Seaport1155Transaction.objects.filter(q)
+    response_data = list(data721.values("tx_hash", "contract_address", "token_id", "buyer", "seller", "matic_price", "weth_price", "usdc_price", "tx_hash__dt", "tx_hash__block_number", "tx_hash__method_name")) + list(data1155.values("tx_hash", "contract_address", "token_id", "quantity", "buyer", "seller", "matic_price", "weth_price", "usdc_price", "tx_hash__dt", "tx_hash__block_number", "tx_hash__method_name"))
     
     response = {
         'status': "success",
-        "data": list(data721.values()) + list(data1155.values())
+        "data": response_data
     }
     return JsonResponse(response)
     
