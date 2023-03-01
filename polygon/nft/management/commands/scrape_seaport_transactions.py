@@ -180,6 +180,8 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         page = 1
         more = True
+        # todo fix this logic to change API call start and end block instead of trying to paginate on the one request
+        # can only fetch 10K results- Need to change start and end block to comb more than 10K txs
         while more:
             polygon_scan_url = f"https://api.polygonscan.com/api?module=account&action=txlist&address={SEAPORT_ADDRESS}&startblock={kwargs['start_block']}&endblock={kwargs['end_block']}&page={page}&offset=10000&sort=asc&apikey={POLYGONSCAN_API_KEY}"
             resp = requests.get(polygon_scan_url)

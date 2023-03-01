@@ -16,6 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from nft.views import get_sales_by_contract
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('get_sales_by_contract', get_sales_by_contract, name='get_sales_by_contract'),
 ]
