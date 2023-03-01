@@ -181,7 +181,7 @@ class Command(BaseCommand):
         page = 1
         more = True
         while more:
-            polygon_scan_url = f"https://api.polygonscan.com/api?module=account&action=txlist&address={SEAPORT_ADDRESS}&startblock={kwargs['start_block']}&endblock={kwargs['end_block']}&page={page}&offset=1000&sort=asc&apikey={POLYGONSCAN_API_KEY}"
+            polygon_scan_url = f"https://api.polygonscan.com/api?module=account&action=txlist&address={SEAPORT_ADDRESS}&startblock={kwargs['start_block']}&endblock={kwargs['end_block']}&page={page}&offset=10000&sort=asc&apikey={POLYGONSCAN_API_KEY}"
             resp = requests.get(polygon_scan_url)
             seaport_txs = resp.json()
             for tx in seaport_txs['result']:
@@ -209,7 +209,7 @@ class Command(BaseCommand):
                     print("SOMETHING WENT WRONG")
                     print(e)
                     print(tx)
-            if len(seaport_txs['result']) == 1000:
+            if len(seaport_txs['result']) == 10000:
                 more = True
                 page += 1
             else:
