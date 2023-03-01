@@ -2,7 +2,7 @@
 
 This is a hackathon Project for ETH Denver 2023
 
-This application lets the user read sales volumes for NFTs on the Polygon Network. 
+This application lets the user read sales volumes for NFTs on the Polygon Network's Seaport. 
 
 The user can query NFT sales volumes by many parameters:
   - block_number / range of block_numbers
