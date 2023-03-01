@@ -16,11 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from nft.views import get_sales_by_contract, get_transactions
+from nft.views import get_daily_sales, get_transactions
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('get_sales_by_contract', get_sales_by_contract, name='get_sales_by_contract'),
+    path('get_daily_sales', get_daily_sales, name='get_daily_sales'),
     path('get_transactions', get_transactions, name='get_transactions'),
 ]
