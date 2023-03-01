@@ -1,10 +1,48 @@
 from django.shortcuts import render
+from django.db.models import Q
+from datetime import datetime
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from nft.models import SeaportTransaction, Seaport1155Transaction, Seaport721Transaction
 
 # Create your views here.
+
+
+@csrf_exempt
+def get_transactions(request):
+    q = Q()
+
+    # these filters are run on the main tx table
+
+    if "start_dt" in request.GET:
+        q &= Q(dt__gte=datetime.fromtimestamp(int(request.GET['start_dt'])))
+    if "end_dt" in request.GET:
+        q &= Q(dt__lte=datetime.fromtimestamp(int(request.GET['end_dt'])))
+    if "start_block" in request.GET:
+        q &= Q(block_number__gte=request.GET['start_block'])
+    if "end_block" in request.GET:
+        q &= Q(block_number__lte=request.GET['end_block'])
+
+    # these filters are run on the subtable
+    if "buyer" in request.GET:
+        y &= Q(buyer=request.GET['buyer'])
+    if "seller" in request.GET:
+        y &= Q(buyer=request.GET['seller'])
+    if "contract_address" in request.GET:
+         y &= Q(contract_address=request.GET['contract_address'])
+    if "token_id" in request.GET:
+        y &= Q(token_id=request.GET['token_id'])
+
+    data = SeaportTransaction.objects.filter(q)
+    joined_data = data.prefetch_related('seaport_721_transaction')
+    response = {
+        'status': "success",
+        "data": list(joined_data.values())
+    }
+    return JsonResponse(response)
+    
+    
 
 @csrf_exempt
 def get_sales_by_contract(request):
