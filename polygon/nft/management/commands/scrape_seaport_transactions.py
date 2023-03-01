@@ -182,8 +182,11 @@ class Command(BaseCommand):
         more = True
         # todo fix this logic to change API call start and end block instead of trying to paginate on the one request
         # can only fetch 10K results- Need to change start and end block to comb more than 10K txs
+        start_block = kwargs['start_block']
+        end_block = kwargs['end_block']
         while more:
-            polygon_scan_url = f"https://api.polygonscan.com/api?module=account&action=txlist&address={SEAPORT_ADDRESS}&startblock={kwargs['start_block']}&endblock={kwargs['end_block']}&page={page}&offset=10000&sort=asc&apikey={POLYGONSCAN_API_KEY}"
+            print(f"making new request from blocks {start_block} to {end_block}")
+            polygon_scan_url = f"https://api.polygonscan.com/api?module=account&action=txlist&address={SEAPORT_ADDRESS}&startblock={start_block}&endblock={end_block}&page={page}&offset=10000&sort=asc&apikey={POLYGONSCAN_API_KEY}"
             resp = requests.get(polygon_scan_url)
             seaport_txs = resp.json()
             for tx in seaport_txs['result']:
@@ -213,7 +216,8 @@ class Command(BaseCommand):
                     print(tx)
             if len(seaport_txs['result']) == 10000:
                 more = True
-                page += 1
+                last_tx = SeaportTransaction.objects.latest('block_id')
+                start_block = str(last_tx.block_number)
             else:
                 more = False
         
