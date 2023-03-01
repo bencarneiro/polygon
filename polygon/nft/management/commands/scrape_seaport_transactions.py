@@ -47,7 +47,7 @@ def determine_volumes(tx_hash):
 
 def analyze_volumes(tx, transfers):
     buyer = None
-    print(transfers)
+    # print(transfers)
     nft_transfers_by_sender = {}
 
     for transfer in transfers:
@@ -67,7 +67,7 @@ def analyze_volumes(tx, transfers):
     # print(nft_transfers_by_sender)
     for seller_address in nft_transfers_by_sender:
 
-        print(nft_transfers_by_sender[seller_address])
+        # print(nft_transfers_by_sender[seller_address])
         trading_activity = nft_transfers_by_sender[seller_address]
 
         if len(trading_activity['coins']) > 0 and len(trading_activity['nfts']) > 0:
@@ -185,24 +185,30 @@ class Command(BaseCommand):
             resp = requests.get(polygon_scan_url)
             seaport_txs = resp.json()
             for tx in seaport_txs['result']:
-                tx_volumes = determine_volumes(tx['hash'])
-                analyze_volumes(tx, tx_volumes)
-                new_tx = SeaportTransaction(
-                    tx_hash = tx['hash'],
-                    method_name = tx['functionName'],
-                    value = tx['value'],
-                    gas_price = int(tx['gasPrice']),
-                    gas_used = int(tx['gasUsed']),
-                    tx_fee = int(tx['gasUsed']) * int(tx['gasPrice']),
-                    tx_reciept_status = tx['txreceipt_status'],
-                    dt = datetime.fromtimestamp(int(tx['timeStamp'])),
-                    block_number = tx['blockNumber'],
-                    is_error = tx['isError'],
-                    to_address = tx['to'],
-                    from_address = tx['from'],
-                    volumes=tx_volumes
-                )
-                new_tx.save()
+                try:
+                    tx_volumes = determine_volumes(tx['hash'])
+                    analyze_volumes(tx, tx_volumes)
+                    new_tx = SeaportTransaction(
+                        tx_hash = tx['hash'],
+                        method_name = tx['functionName'],
+                        value = tx['value'],
+                        gas_price = int(tx['gasPrice']),
+                        gas_used = int(tx['gasUsed']),
+                        tx_fee = int(tx['gasUsed']) * int(tx['gasPrice']),
+                        tx_reciept_status = tx['txreceipt_status'],
+                        dt = datetime.fromtimestamp(int(tx['timeStamp'])),
+                        block_number = tx['blockNumber'],
+                        is_error = tx['isError'],
+                        to_address = tx['to'],
+                        from_address = tx['from'],
+                        volumes=tx_volumes
+                    )
+                    new_tx.save()
+                    print(f"successfully analyzed tx_hash {tx['hash']}")
+                except Exception as e: 
+                    print("SOMETHING WENT WRONG")
+                    print(e)
+                    print(tx)
             if len(seaport_txs['result']) == 1000:
                 more = True
                 page += 1
