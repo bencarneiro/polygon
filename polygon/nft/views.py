@@ -26,13 +26,13 @@ def get_transactions(request):
 
     # these filters are run on the subtable
     if "buyer" in request.GET:
-        y &= Q(buyer=request.GET['buyer'])
+        q &= Q(buyer=request.GET['buyer'])
     if "seller" in request.GET:
-        y &= Q(seller=request.GET['seller'])
+        q &= Q(seller=request.GET['seller'])
     if "contract_address" in request.GET:
-         y &= Q(contract_address=request.GET['contract_address'])
+         q &= Q(contract_address=request.GET['contract_address'])
     if "token_id" in request.GET:
-        y &= Q(token_id=request.GET['token_id'])
+        q &= Q(token_id=request.GET['token_id'])
     if "coin_standard" in request.GET:
         coin_standard = request.GET['coin_standard']
         if coin_standard not in ['1155', '721']:
