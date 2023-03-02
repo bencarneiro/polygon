@@ -18,9 +18,9 @@ def get_transactions(request):
     params = {}
     if "start_dt" in request.GET and request.GET['start_dt']:
         params['start_dt'] = request.GET['start_dt']
-        q &= Q(tx_hash__dt__gte=datetime.fromtimestamp(int(request.GET['start_dt'])))
+        q &= Q(tx_hash__dt__gte=request.GET['start_dt'])
     if "end_dt" in request.GET and request.GET['end_dt']:
-        q &= Q(tx_hash__dt__lte=datetime.fromtimestamp(int(request.GET['end_dt'])))
+        q &= Q(tx_hash__dt__lte=request.GET['end_dt'])
         params['end_dt'] = request.GET['end_dt']
     # if "start_block" in request.GET:
     #     q &= Q(tx_hash__block_number__gte=request.GET['start_block'])
@@ -79,9 +79,9 @@ def get_volume(request):
     params = {}
     if "start_dt" in request.GET and request.GET['start_dt']:
         params['start_dt'] = request.GET['start_dt']
-        q &= Q(tx_hash__dt__gte=datetime.fromtimestamp(int(request.GET['start_dt'])))
+        q &= Q(tx_hash__dt__gte=request.GET['start_dt'])
     if "end_dt" in request.GET and request.GET['end_dt']:
-        q &= Q(tx_hash__dt__lte=datetime.fromtimestamp(int(request.GET['end_dt'])))
+        q &= Q(tx_hash__dt__lte=request.GET['end_dt'])
         params['end_dt'] = request.GET['end_dt']
     # if "start_block" in request.GET:
     #     q &= Q(tx_hash__block_number__gte=request.GET['start_block'])
@@ -214,9 +214,9 @@ def get_daily_sales_volume(request):
     params = {}
     if "start_dt" in request.GET and request.GET['start_dt']:
         params['start_dt'] = request.GET['start_dt']
-        q &= Q(tx_hash__dt__gte=datetime.fromtimestamp(int(request.GET['start_dt'])))
+        q &= Q(tx_hash__dt__gte=request.GET['start_dt'])
     if "end_dt" in request.GET and request.GET['end_dt']:
-        q &= Q(tx_hash__dt__lte=datetime.fromtimestamp(int(request.GET['end_dt'])))
+        q &= Q(tx_hash__dt__lte=request.GET['end_dt'])
         params['end_dt'] = request.GET['end_dt']
     # if "start_block" in request.GET:
     #     q &= Q(tx_hash__block_number__gte=request.GET['start_block'])
@@ -303,9 +303,9 @@ def get_weekly_sales_volume(request):
     params = {}
     if "start_dt" in request.GET and request.GET['start_dt']:
         params['start_dt'] = request.GET['start_dt']
-        q &= Q(tx_hash__dt__gte=datetime.fromtimestamp(int(request.GET['start_dt'])))
+        q &= Q(tx_hash__dt__gte=request.GET['start_dt'])
     if "end_dt" in request.GET and request.GET['end_dt']:
-        q &= Q(tx_hash__dt__lte=datetime.fromtimestamp(int(request.GET['end_dt'])))
+        q &= Q(tx_hash__dt__lte=request.GET['end_dt'])
         params['end_dt'] = request.GET['end_dt']
     # if "start_block" in request.GET:
     #     q &= Q(tx_hash__block_number__gte=request.GET['start_block'])
@@ -390,11 +390,11 @@ def get_monthly_sales_volume(request):
 
     # these filters are run on the main tx table
     params = {}
-    if "start_dt" in request.GET:
+    if "start_dt" in request.GET and request.GET['start_dt']:
         params['start_dt'] = request.GET['start_dt']
-        q &= Q(tx_hash__dt__gte=datetime.fromtimestamp(int(request.GET['start_dt'])))
-    if "end_dt" in request.GET:
-        q &= Q(tx_hash__dt__lte=datetime.fromtimestamp(int(request.GET['end_dt'])))
+        q &= Q(tx_hash__dt__gte=request.GET['start_dt'])
+    if "end_dt" in request.GET and request.GET['end_dt']:
+        q &= Q(tx_hash__dt__lte=request.GET['end_dt'])
         params['end_dt'] = request.GET['end_dt']
     # if "start_block" in request.GET:
     #     q &= Q(tx_hash__block_number__gte=request.GET['start_block'])
@@ -402,19 +402,19 @@ def get_monthly_sales_volume(request):
     #     q &= Q(tx_hash__block_number__lte=request.GET['end_block'])
 
     # these filters are run on the subtable
-    if "buyer" in request.GET:
+    if "buyer" in request.GET and request.GET['buyer']:
         q &= Q(buyer=request.GET['buyer'])
         params['buyer'] = request.GET['buyer']
-    if "seller" in request.GET:
+    if "seller" in request.GET and request.GET['seller']:
         q &= Q(seller=request.GET['seller'])
         params['seller'] = request.GET['seller']
-    if "contract_address" in request.GET:
+    if "contract_address" in request.GET and request.GET['contract_address']:
          q &= Q(contract_address=request.GET['contract_address'])
          params['contract_address'] = request.GET['contract_address']
-    if "token_id" in request.GET:
+    if "token_id" in request.GET and request.GET['token_id']:
         q &= Q(token_id=request.GET['token_id'])
         params['token_id'] = request.GET['token_id']
-    if "coin_standard" in request.GET:
+    if "coin_standard" in request.GET and request.GET['coin_standard']:
         params['coin_standard'] = request.GET['coin_standard']
         coin_standard = request.GET['coin_standard']
         if coin_standard not in ['1155', '721', 'all']:
