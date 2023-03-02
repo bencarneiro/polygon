@@ -49,6 +49,22 @@ def analyze_volumes(tx, transfers):
     buyer = None
     # print(transfers)
     nft_transfers_by_sender = {}
+    new_tx = SeaportTransaction(
+        tx_hash = tx['hash'],
+        method_name = tx['functionName'],
+        value = tx['value'],
+        gas_price = int(tx['gasPrice']),
+        gas_used = int(tx['gasUsed']),
+        tx_fee = int(tx['gasUsed']) * int(tx['gasPrice']),
+        tx_reciept_status = tx['txreceipt_status'],
+        dt = datetime.fromtimestamp(int(tx['timeStamp'])),
+        block_number = tx['blockNumber'],
+        is_error = tx['isError'],
+        to_address = tx['to'],
+        from_address = tx['from'],
+        volumes=transfers
+    )
+    new_tx.save()
 
     for transfer in transfers:
 
@@ -88,7 +104,7 @@ def analyze_volumes(tx, transfers):
             for nft_transfer in trading_activity['nfts']:
                 if nft_transfer['type'] == "ERC721":
                     new_721_tx = Seaport721Transaction(
-                        tx_hash = tx['hash'],
+                        tx_hash = new_tx,
                         contract_address = nft_transfer['contract_address'],
                         token_id = nft_transfer['token_id'],
                         matic_price = matic_price,
@@ -102,7 +118,7 @@ def analyze_volumes(tx, transfers):
 
                 if nft_transfer['type'] == "ERC1155":
                     new_1155_tx = Seaport1155Transaction(
-                        tx_hash = tx['hash'],
+                        tx_hash = new_tx,
                         contract_address = nft_transfer['contract_address'],
                         token_id = nft_transfer['token_id'],
                         quantity = nft_transfer['quantity'],
@@ -193,22 +209,6 @@ class Command(BaseCommand):
                 try:
                     tx_volumes = determine_volumes(tx['hash'])
                     analyze_volumes(tx, tx_volumes)
-                    new_tx = SeaportTransaction(
-                        tx_hash = tx['hash'],
-                        method_name = tx['functionName'],
-                        value = tx['value'],
-                        gas_price = int(tx['gasPrice']),
-                        gas_used = int(tx['gasUsed']),
-                        tx_fee = int(tx['gasUsed']) * int(tx['gasPrice']),
-                        tx_reciept_status = tx['txreceipt_status'],
-                        dt = datetime.fromtimestamp(int(tx['timeStamp'])),
-                        block_number = tx['blockNumber'],
-                        is_error = tx['isError'],
-                        to_address = tx['to'],
-                        from_address = tx['from'],
-                        volumes=tx_volumes
-                    )
-                    new_tx.save()
                     print(f"successfully analyzed tx_hash {tx['hash']}")
                 except Exception as e: 
                     print("SOMETHING WENT WRONG")
