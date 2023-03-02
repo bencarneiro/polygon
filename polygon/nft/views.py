@@ -371,11 +371,13 @@ def get_weekly_sales_volume(request):
     response = {
         "status": "success",
         "data": {
-            "721": list(weekly_sales_721),
-            "1155": list(weekly_sales_1155)
+            "ERC721": list(weekly_sales_721),
+            "ERC1155": list(weekly_sales_1155)
         },
         "parameters": params
     }
+    if "response_type" in request.GET and request.GET['response_type'] == "html":
+        return render(request, "get_weekly_volumes.html", response)
 
     return JsonResponse(response)
 
@@ -458,11 +460,14 @@ def get_monthly_sales_volume(request):
     response = {
         "status": "success",
         "data": {
-            "721": list(monthly_sales_721),
-            "1155": list(monthly_sales_1155)
+            "ERC721": list(monthly_sales_721),
+            "ERC1155": list(monthly_sales_1155)
         },
         "parameters": params
     }
+
+    if "response_type" in request.GET and request.GET['response_type'] == "html":
+        return render(request, "get_monthly_volumes.html", response)
 
     return JsonResponse(response)
 
