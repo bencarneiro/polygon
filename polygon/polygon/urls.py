@@ -16,12 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from nft.views import get_volume, get_transactions, get_daily_sales_volume
+from nft.views import get_volume, get_transactions, get_daily_sales_volume, get_monthly_sales_volume, get_weekly_sales_volume
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('get_volume', get_volume, name='get_volume'),
     path('get_transactions', get_transactions, name='get_transactions'),
-    path('get_daily_sales_volume', get_daily_sales_volume, name='get_daily_sales_volume')
+    path('get_daily_sales_volume', get_daily_sales_volume, name='get_daily_sales_volume'),
+    path('get_monthly_sales_volume', get_monthly_sales_volume, name='get_monthly_sales_volume'),
+    path('get_weekly_sales_volume', get_weekly_sales_volume, name='get_weekly_sales_volume')
 ]
