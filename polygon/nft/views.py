@@ -282,11 +282,14 @@ def get_daily_sales_volume(request):
     response = {
         "status": "success",
         "data": {
-            "721": list(daily_sales_721),
-            "1155": list(daily_sales_1155)
+            "ERC721": list(daily_sales_721),
+            "ERC1155": list(daily_sales_1155)
         },
         "parameters": params
     }
+
+    if "response_type" in request.GET and request.GET['response_type'] == "html":
+        return render(request, "get_daily_volumes.html", response)
 
     return JsonResponse(response)
 

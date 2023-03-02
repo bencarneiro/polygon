@@ -1,0 +1,105 @@
+<html>
+    <h1>Get Daily Sales Summary of NFT Trades on Polygon</h1>
+
+    <br></br>
+    <br></br>
+
+    <form method="get" action="get_daily_sales_volume">
+        <label>contract address</label>
+        <input name="contract_address" id="contract_address" type="text"/>
+        <br></br>
+        <label>token_id</label>
+        <input name="token_id" id="token_id" type="text"/>
+        <br></br>
+        <label>start date</label>
+        <input name="start_date" id="start_date" type="date"/>
+        <br></br>
+        <label>end date</label>
+        <input name="end_date" id="end_date" type="date"/>
+        <br></br>
+        <label>buyer</label>
+        <input name="buyer" id="buyer" type="text"/>
+        <br></br>
+        <label>seller</label>
+        <input name="seller" id="seller" type="text"/>
+        <br></br>
+        <label>coin_standard</label>
+        <select name="coin_standard" id="coin_standard"">
+            <option value="all">all</option>
+            <option value="721">ERC721</option>
+            <option value="1155">ERC1155</option>
+        </select>
+        <br></br>
+        <label>response type</label>
+        <select name="response_type" id="response_type">
+            <option value="html">html</option>
+            <option value="json">json</option>
+        </select>
+        <br></br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <br></br>
+    <br></br>
+
+    <p>search parameters for data below </p>
+    <p>
+        {{ parameters }}
+    </p>
+
+    <br></br>
+    <br></br>
+    <h2>ERC721 Tokens</h2>
+    <table border="1">
+        <tr>
+            <th>Day</th>
+            <th>MATIC Volume</th>
+            <th>WETH Volume</th>
+            <th>USDC Volume</th>
+            <th>Total Sales</th>
+            <th>Spot USD Volume</th>
+            <th>Average Sale Price</th>
+        </tr>
+            {% for day in data.ERC721 %}
+            <tr>
+            <td>{{ day.day }}</td>
+            <td>{{ day.matic_volume }}</td>
+            <td>{{ day.weth_volume }}</td>
+            <td>{{ day.usdc_volume }}</td>
+            <td>{{ day.total_sales }}</td>
+            <td>{{ day.spot_usd_volume }}</td>
+            <td>{{ day.average_sale_price }}</td>
+            </tr>
+            {% endfor %}
+    </table>
+
+    <br></br>
+    <br></br>
+    <h2>ERC1155 Tokens</h2>
+    <table border="1">
+        <tr>
+            <th>Day</th>
+            <th>MATIC Volume</th>
+            <th>WETH Volume</th>
+            <th>USDC Volume</th>
+            <th>Total Sales</th>
+            <th>Spot USD Volume</th>
+            <th>Average Sale Price</th>
+            <th>Total Individual Tokens Sold</th>
+            <th>Average Sale Price Per Individual Token</th>
+        </tr>
+            {% for day in data.ERC1155 %}
+            <tr>
+            <td>{{ day.day }}</td>
+            <td>{{ day.matic_volume }}</td>
+            <td>{{ day.weth_volume }}</td>
+            <td>{{ day.usdc_volume }}</td>
+            <td>{{ day.total_sales }}</td>
+            <td>{{ day.spot_usd_volume }}</td>
+            <td>{{ day.average_sale_price }}</td>
+            <td>{{ day.total_individual_tokens_sold }}</td>
+            <td>{{ day.average_sale_price_per_individual_token }}</td>
+            </tr>
+            {% endfor %}
+    </table>
+</html>
