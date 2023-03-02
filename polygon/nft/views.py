@@ -106,35 +106,68 @@ def get_volume(request):
             return JsonResponse({'status': 'error', 'message': 'coin_standard is invalid: needs to be 721 or 1155'})
     else:
         coin_standard = "all"
-
+    
+    matic_spot_price = SpotPrice.objects.get(token_name="MATIC").price
+    weth_spot_price = SpotPrice.objects.get(token_name="WETH").price
+    usdc_spot_price = 1
 
     data721 = Seaport721Transaction.objects.filter(q)
     data1155 = Seaport1155Transaction.objects.filter(q)
 
-    nft_volumes_721 = data721.aggregate(matic_volume=Sum("matic_price"), usdc_volume=Sum("usdc_price"), weth_volume=Sum('weth_price'), total_transactions=Count('id'))
-    nft_volumes_1155 = data1155.aggregate(matic_volume=Sum("matic_price"), usdc_volume=Sum("usdc_price"), weth_volume=Sum('weth_price'), total_transactions=Count('id'))
-    if coin_standard == "all":
-        total_volumes = {
-            "matic_volume": int(nft_volumes_721['matic_volume'])/(10**18) + int(nft_volumes_1155['matic_volume'])/(10**18),
-            "usdc_volume": int(nft_volumes_721['usdc_volume'])/(10**6) + int(nft_volumes_1155['usdc_volume'])/(10**6),
-            "weth_volume": int(nft_volumes_721['weth_volume'])/(10**18) + int(nft_volumes_1155['weth_volume'])/(10**18),
-            "tx_count": int(nft_volumes_721['total_transactions']) + int(nft_volumes_1155['total_transactions'])
-        }
-    if coin_standard == "721":
-        total_volumes = {
-            "matic_volume": int(nft_volumes_721['matic_volume'])/(10**18),
-            "usdc_volume": int(nft_volumes_721['usdc_volume'])/(10**6),
-            "weth_volume": int(nft_volumes_721['weth_volume'])/(10**18),
-            "tx_count": int(nft_volumes_721['total_transactions'])
-        }
-    if coin_standard == "1155":
-        total_volumes = {
-            "matic_volume":int(nft_volumes_1155['matic_volume'])/(10**18),
-            "usdc_volume": int(nft_volumes_1155['usdc_volume'])/(10**6),
-            "weth_volume": int(nft_volumes_1155['weth_volume'])/(10**18),
-            "tx_count": int(nft_volumes_1155['total_transactions'])
-        }
-    # usdc_volume
+    nft_volumes_721 = data721.aggregate(
+        matic_volume=Sum("matic_price"), 
+        usdc_volume=Sum("usdc_price"), 
+        weth_volume=Sum('weth_price'), 
+        total_transactions=Count('id'),
+        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)
+    )
+
+
+    nft_volumes_1155 = data1155.aggregate(
+        matic_volume=Sum("matic_price"), 
+        usdc_volume=Sum("usdc_price"), 
+        weth_volume=Sum('weth_price'), 
+        total_transactions=Count('id'),
+        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)
+    )
+
+    matic_volume = 0
+    if nft_volumes_721['matic_volume'] and (not coin_standard == "1155"):
+        matic_volume += int(nft_volumes_721['matic_volume'])/(10**18)
+    if nft_volumes_1155['matic_volume'] and (not coin_standard == "721"):
+        matic_volume += int(nft_volumes_1155['matic_volume'])/(10**18)
+
+    usdc_volume = 0
+    if nft_volumes_721['usdc_volume'] and (not coin_standard == "1155"):
+        usdc_volume += int(nft_volumes_721['usdc_volume'])/(10**6)
+    if nft_volumes_1155['usdc_volume'] and (not coin_standard == "721"):
+        usdc_volume += int(nft_volumes_1155['usdc_volume'])/(10**6)
+
+    weth_volume = 0
+    if nft_volumes_721['weth_volume'] and (not coin_standard == "1155"):
+        weth_volume += int(nft_volumes_721['weth_volume'])/(10**18)
+    if nft_volumes_1155['weth_volume'] and (not coin_standard == "721"):
+        weth_volume += int(nft_volumes_1155['weth_volume'])/(10**18)
+
+    total_transactions = 0
+    if nft_volumes_721['total_transactions'] and (not coin_standard == "1155"):
+        total_transactions += int(nft_volumes_721['total_transactions'])
+    if nft_volumes_1155['total_transactions'] and (not coin_standard == "721"):
+        total_transactions += int(nft_volumes_1155['total_transactions'])
+
+    spot_usd_volume = 0
+    if nft_volumes_721['matic_volume'] and (not coin_standard == "1155"):
+        spot_usd_volume += nft_volumes_721['spot_usd_volume']
+    if nft_volumes_1155['matic_volume'] and (not coin_standard == "721"):
+        spot_usd_volume += nft_volumes_1155['spot_usd_volume']
+    
+    total_volumes = {
+        "matic_volume": matic_volume,
+        "usdc_volume": usdc_volume,
+        "weth_volume": weth_volume,
+        "tx_count": total_transactions,
+        "spot_usd_volume": spot_usd_volume
+    }
     response = {
         "status": "success",
         "data": total_volumes,
@@ -142,11 +175,6 @@ def get_volume(request):
     }
     return JsonResponse(response)
 
-    # steps
-    # take start_dt, end_dt, start_block, end_block
-    # segment the total timeframe into its component days by epoch   timestamp (49403394-3940494933)
-    # for each of the timeblocks, crunch the numbers on data721 and data1155
-    # add each set of stats to the data list in order
 
 
 
