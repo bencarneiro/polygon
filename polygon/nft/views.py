@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from django.db.models import Q
+from django.db.models import Q, FloatField
 from datetime import datetime
 from django.db.models.functions import TruncMonth, TruncDay, TruncYear
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from nft.models import SeaportTransaction, Seaport1155Transaction, Seaport721Transaction
+from nft.models import SeaportTransaction, Seaport1155Transaction, Seaport721Transaction, SpotPrice
 from django.db.models import Sum, Count
 
 # Create your views here.
@@ -194,14 +194,20 @@ def get_daily_sales_volume(request):
 
     # nft_volumes_721 = data721.annotate(matic_volume=Sum("matic_price"), usdc_volume=Sum("usdc_price"), weth_volume=Sum('weth_price'), total_transactions=Count('id'))
     # nft_volumes_1155 = data1155.aggregate(matic_volume=Sum("matic_price"), usdc_volume=Sum("usdc_price"), weth_volume=Sum('weth_price'), total_transactions=Count('id'))
-    
+
+    matic_spot_price = SpotPrice.objects.get(token_name="MATIC").price
+    weth_spot_price = SpotPrice.objects.get(token_name="WETH").price
+    usdc_spot_price = 1
+
     daily_sales_721 = Seaport721Transaction.objects.filter(q).annotate(
         day=TruncDay('tx_hash__dt'),
     ).values('day').annotate(
         matic_volume=(Sum('matic_price')/(10**18)),
         usdc_volume=(Sum('usdc_price')/(10**18)),
         weth_volume=(Sum('weth_price')/(10**18)),
-        total_sales=(Count('id'))
+        total_sales=(Count('id')),
+        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
+        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id'))
     )
 
     daily_sales_1155 = Seaport1155Transaction.objects.filter(q).annotate(
@@ -210,7 +216,9 @@ def get_daily_sales_volume(request):
         matic_volume=(Sum('matic_price')/(10**18)),
         usdc_volume=(Sum('usdc_price')/(10**18)),
         weth_volume=(Sum('weth_price')/(10**18)),
-        total_sales=(Count('id'))
+        total_sales=(Count('id')),
+        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
+        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id'))
     )
 
     response = {
