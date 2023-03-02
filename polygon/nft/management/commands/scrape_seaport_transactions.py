@@ -216,8 +216,7 @@ class Command(BaseCommand):
                     print(tx)
             if len(seaport_txs['result']) == 10000:
                 more = True
-                last_tx = SeaportTransaction.objects.latest('block_number')
-                start_block = str(last_tx.block_number)
+                start_block = str(seaport_txs['result'][-1]['blockNumber'])
             else:
                 more = False
         

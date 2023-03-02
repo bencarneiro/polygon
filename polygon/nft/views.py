@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Q
 from datetime import datetime
-from django.db.models.functions import TruncMonth
+from django.db.models.functions import TruncMonth, TruncDay, TruncYear
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from nft.models import SeaportTransaction, Seaport1155Transaction, Seaport721Transaction
@@ -150,15 +150,76 @@ def get_volume(request):
 
 
 
-    # todo allow for filter by type (721/1155)
+@csrf_exempt
+def get_daily_sales_volume(request):
+    q = Q()
 
-    # Structure needs to look like this
-    # {"data": [{
-    #     "date": "2020-15-15"
-    #     "matic_volume":
-    #     "weth_volume":
-    #     "usdc_volume"
-    #     "total volume in current USD"
-    #     "number of transactions"
-    #     "filter parameters" : {"contract_address": , "token_id"}
-    # }]}
+    # these filters are run on the main tx table
+    params = {}
+    if "start_dt" in request.GET:
+        params['start_dt'] = request.GET['start_dt']
+        q &= Q(tx_hash__dt__gte=datetime.fromtimestamp(int(request.GET['start_dt'])))
+    if "end_dt" in request.GET:
+        q &= Q(tx_hash__dt__lte=datetime.fromtimestamp(int(request.GET['end_dt'])))
+        params['end_dt'] = request.GET['end_dt']
+    # if "start_block" in request.GET:
+    #     q &= Q(tx_hash__block_number__gte=request.GET['start_block'])
+    # if "end_block" in request.GET:
+    #     q &= Q(tx_hash__block_number__lte=request.GET['end_block'])
+
+    # these filters are run on the subtable
+    if "buyer" in request.GET:
+        q &= Q(buyer=request.GET['buyer'])
+        params['buyer'] = request.GET['buyer']
+    if "seller" in request.GET:
+        q &= Q(seller=request.GET['seller'])
+        params['seller'] = request.GET['seller']
+    if "contract_address" in request.GET:
+         q &= Q(contract_address=request.GET['contract_address'])
+         params['contract_address'] = request.GET['contract_address']
+    if "token_id" in request.GET:
+        q &= Q(token_id=request.GET['token_id'])
+        params['token_id'] = request.GET['token_id']
+    if "coin_standard" in request.GET:
+        params['coin_standard'] = request.GET['coin_standard']
+        coin_standard = request.GET['coin_standard']
+        if coin_standard not in ['1155', '721']:
+            return JsonResponse({'status': 'error', 'message': 'coin_standard is invalid: needs to be 721 or 1155'})
+    else:
+        coin_standard = "all"
+
+
+    data721 = Seaport721Transaction.objects.filter(q)
+    data1155 = Seaport1155Transaction.objects.filter(q)
+
+    # nft_volumes_721 = data721.annotate(matic_volume=Sum("matic_price"), usdc_volume=Sum("usdc_price"), weth_volume=Sum('weth_price'), total_transactions=Count('id'))
+    # nft_volumes_1155 = data1155.aggregate(matic_volume=Sum("matic_price"), usdc_volume=Sum("usdc_price"), weth_volume=Sum('weth_price'), total_transactions=Count('id'))
+    
+    daily_sales_721 = Seaport721Transaction.objects.filter(q).annotate(
+        day=TruncDay('tx_hash__dt'),
+    ).values('day').annotate(
+        matic_volume=(Sum('matic_price')/(10**18)),
+        usdc_volume=(Sum('usdc_price')/(10**18)),
+        weth_volume=(Sum('weth_price')/(10**18)),
+        total_sales=(Count('id'))
+    )
+
+    daily_sales_1155 = Seaport1155Transaction.objects.filter(q).annotate(
+        day=TruncDay('tx_hash__dt'),
+    ).values('day').annotate(
+        matic_volume=(Sum('matic_price')/(10**18)),
+        usdc_volume=(Sum('usdc_price')/(10**18)),
+        weth_volume=(Sum('weth_price')/(10**18)),
+        total_sales=(Count('id'))
+    )
+
+    response = {
+        "status": "success",
+        "data": {
+            "721": list(daily_sales_721),
+            "1155": list(daily_sales_1155)
+        },
+        "parameters": params
+    }
+
+    return JsonResponse(response)
