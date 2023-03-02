@@ -195,7 +195,7 @@ def get_volume(request):
     }
 
     if "response_type" in request.GET and request.GET['response_type'] == "html":
-        return render(request, "home.html", response)
+        return render(request, "get_volume.html", response)
 
     return JsonResponse(response)
 
@@ -465,3 +465,23 @@ def get_monthly_sales_volume(request):
 @csrf_exempt
 def homepage(request):
     return render(request, "home.html", {})
+
+@csrf_exempt
+def get_volume_page(request):
+    return render(request, "get_volume.html", {})
+    
+@csrf_exempt
+def get_transactions_page(request):
+    return render(request, "get_transactions.html", {})
+
+@csrf_exempt
+def get_daily_volume_page(request):
+    return render(request, "get_daily_volumes.html", {})
+
+@csrf_exempt
+def get_weekly_volume_page(request):
+    return render(request, "get_weekly_volumes.html", {})
+
+@csrf_exempt
+def get_monthly_volume_page(request):
+    return render(request, "get_monthly_volumes.html", {})

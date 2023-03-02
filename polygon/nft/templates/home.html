@@ -1,82 +1,14 @@
 <html>
     <h1>Get Volumes for NFT Sales on Polygon</h1>
-    <table>
-    
-        <tr>
-            <th>MATIC Volume</th>
-            <td>{{ data.matic_volume }}</td>
-        </tr>
-        <tr>
-            <th>WETH Volume</th>
-            <td>{{ data.weth_volume }}</td>
-        </tr>
-        <tr>
-            <th>USDC Volume</th>
-            <td>{{ data.usdc_volume }}</td>
-        </tr>
-        <tr>
-            <th>Total NFT Transactions</th>
-            <td>{{ data.tx_count }}</td>
-        </tr>
-        <tr>
-            <th>Spot USD Volume</th>
-            <td>{{ data.spot_usd_volume }}</td>
-        </tr>
-        <tr>
-            <th>Average Sale Price</th>
-            <td>{{ data.average_sale_price }}</td>
-        </tr>
-        <tr>
-            <th>Total Individual Tokens Sold</th>
-            <td>{{ data.total_individual_tokens_sold }}</td>
-        </tr>
-        <tr>
-            <th>Average Sale Price Per Individual Token</th>
-            <td>{{ data.average_sale_price_per_individual_token }}</td>
-        </tr>
 
-    </table>
+    <a href="get_transactions_page"> Get a list of individual NFT sales</a>
     <br></br>
+    <a href="get_volume_page"> Get NFT Sales Statistics over a custom Date range</a>
     <br></br>
-    <p>search parameters for data above ^</p>
-    <p>
-        {{ parameters }}
-    </p>
+    <a href="get_daily_volume_page"> Get Daily Sales Statistics</a>
     <br></br>
+    <a href="get_weekly_volume_page"> Get Weekly Sales Statistics</a>
     <br></br>
+    <a href="get_monthly_volume_page"> Get Monthly Sales Statistics</a>
 
-    <form method="get" action="get_volume">
-        <label>contract address</label>
-        <input name="contract_address" id="contract_address" type="text"/>
-        <br></br>
-        <label>token_id</label>
-        <input name="token_id" id="token_id" type="text"/>
-        <br></br>
-        <label>start date</label>
-        <input name="start_date" id="start_date" type="date"/>
-        <br></br>
-        <label>end date</label>
-        <input name="end_date" id="end_date" type="date"/>
-        <br></br>
-        <label>buyer</label>
-        <input name="buyer" id="buyer" type="text"/>
-        <br></br>
-        <label>seller</label>
-        <input name="seller" id="seller" type="text"/>
-        <br></br>
-        <label>coin_standard</label>
-        <select name="coin_standard" id="coin_standard"">
-            <option value="all">all</option>
-            <option value="721">ERC721</option>
-            <option value="1155">ERC1155</option>
-        </select>
-        <br></br>
-        <label>response type</label>
-        <select name="response_type" id="response_type">
-            <option value="html">html</option>
-            <option value="json">json</option>
-        </select>
-        <br></br>
-        <button type="submit">Submit</button>
-    </form>
 </html>

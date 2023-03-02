@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from nft.views import get_volume, get_transactions, get_daily_sales_volume, get_monthly_sales_volume, get_weekly_sales_volume, homepage
+from nft.views import get_volume, get_transactions, get_daily_sales_volume, get_monthly_sales_volume, get_weekly_sales_volume, homepage, get_volume_page, get_transactions_page, get_monthly_volume_page, get_weekly_volume_page, get_daily_volume_page
 
 
 urlpatterns = [
@@ -26,5 +26,10 @@ urlpatterns = [
     path('get_daily_sales_volume', get_daily_sales_volume, name='get_daily_sales_volume'),
     path('get_monthly_sales_volume', get_monthly_sales_volume, name='get_monthly_sales_volume'),
     path('get_weekly_sales_volume', get_weekly_sales_volume, name='get_weekly_sales_volume'),
-    path('', homepage, name='homepage')
+    path('get_volume_page', get_volume_page, name='get_volume_page'),
+    path('get_transactions_page', get_transactions_page, name='get_transactions_page'),
+    path('get_daily_volume_page', get_daily_volume_page, name='get_daily_volume_page'),
+    path('get_weekly_volume_page', get_weekly_volume_page, name='get_weekly_volume_page'),
+    path('get_monthly_volume_page', get_monthly_volume_page, name='get_monthly_volume_page'),
+    path('', homepage, name='homepage'),
 ]
