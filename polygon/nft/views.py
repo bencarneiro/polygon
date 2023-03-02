@@ -217,8 +217,10 @@ def get_daily_sales_volume(request):
         usdc_volume=(Sum('usdc_price')/(10**18)),
         weth_volume=(Sum('weth_price')/(10**18)),
         total_sales=(Count('id')),
+        total_individual_tokens_sold=Sum("quantity"),
         spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
-        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id'))
+        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id')),
+        average_sale_price_per_individual_token=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Sum('quantity', output_field=FloatField()))
     )
 
     response = {
