@@ -128,7 +128,9 @@ def get_volume(request):
         usdc_volume=Sum("usdc_price"), 
         weth_volume=Sum('weth_price'), 
         total_transactions=Count('id'),
-        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)
+        total_individual_tokens_sold=Sum("quantity"),
+        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
+        
     )
 
     matic_volume = 0
@@ -160,13 +162,33 @@ def get_volume(request):
         spot_usd_volume += nft_volumes_721['spot_usd_volume']
     if nft_volumes_1155['matic_volume'] and (not coin_standard == "721"):
         spot_usd_volume += nft_volumes_1155['spot_usd_volume']
+
+    total_individual_tokens_sold = 0
+    if nft_volumes_721['total_transactions'] and (not coin_standard == "1155"):
+        total_individual_tokens_sold += int(nft_volumes_721['total_transactions'])
+    if nft_volumes_1155['total_individual_tokens_sold'] and (not coin_standard == "721"):
+        total_individual_tokens_sold += int(nft_volumes_1155['total_individual_tokens_sold'])
+
+    average_sale_price = 0
+    if total_transactions > 0:
+        average_sale_price = spot_usd_volume / total_transactions
     
+
+    average_sale_price_per_individual_token = 0
+    if total_individual_tokens_sold > 0:
+        average_sale_price_per_individual_token = spot_usd_volume / total_individual_tokens_sold
+
+
     total_volumes = {
         "matic_volume": matic_volume,
         "usdc_volume": usdc_volume,
         "weth_volume": weth_volume,
         "tx_count": total_transactions,
-        "spot_usd_volume": spot_usd_volume
+        "spot_usd_volume": spot_usd_volume,
+        "average_sale_price": average_sale_price,
+        "total_individual_tokens_sold": total_individual_tokens_sold,
+        "average_sale_price_per_individual_token": average_sale_price_per_individual_token
+
     }
     response = {
         "status": "success",
