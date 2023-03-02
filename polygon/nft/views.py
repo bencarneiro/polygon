@@ -116,21 +116,21 @@ def get_volume(request):
     if coin_standard == "all":
         total_volumes = {
             "matic_volume": int(nft_volumes_721['matic_volume'])/(10**18) + int(nft_volumes_1155['matic_volume'])/(10**18),
-            "usdc_volume": int(nft_volumes_721['usdc_volume'])/(10**18) + int(nft_volumes_1155['usdc_volume'])/(10**18),
+            "usdc_volume": int(nft_volumes_721['usdc_volume'])/(10**6) + int(nft_volumes_1155['usdc_volume'])/(10**6),
             "weth_volume": int(nft_volumes_721['weth_volume'])/(10**18) + int(nft_volumes_1155['weth_volume'])/(10**18),
             "tx_count": int(nft_volumes_721['total_transactions']) + int(nft_volumes_1155['total_transactions'])
         }
     if coin_standard == "721":
         total_volumes = {
             "matic_volume": int(nft_volumes_721['matic_volume'])/(10**18),
-            "usdc_volume": int(nft_volumes_721['usdc_volume'])/(10**18),
+            "usdc_volume": int(nft_volumes_721['usdc_volume'])/(10**6),
             "weth_volume": int(nft_volumes_721['weth_volume'])/(10**18),
             "tx_count": int(nft_volumes_721['total_transactions'])
         }
     if coin_standard == "1155":
         total_volumes = {
             "matic_volume":int(nft_volumes_1155['matic_volume'])/(10**18),
-            "usdc_volume": int(nft_volumes_1155['usdc_volume'])/(10**18),
+            "usdc_volume": int(nft_volumes_1155['usdc_volume'])/(10**6),
             "weth_volume": int(nft_volumes_1155['weth_volume'])/(10**18),
             "tx_count": int(nft_volumes_1155['total_transactions'])
         }
@@ -203,24 +203,24 @@ def get_daily_sales_volume(request):
         day=TruncDay('tx_hash__dt'),
     ).values('day').annotate(
         matic_volume=(Sum('matic_price')/(10**18)),
-        usdc_volume=(Sum('usdc_price')/(10**18)),
+        usdc_volume=(Sum('usdc_price')/(10**6)),
         weth_volume=(Sum('weth_price')/(10**18)),
         total_sales=(Count('id')),
-        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
-        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id'))
+        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
+        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id'))
     )
 
     daily_sales_1155 = Seaport1155Transaction.objects.filter(q).annotate(
         day=TruncDay('tx_hash__dt'),
     ).values('day').annotate(
         matic_volume=(Sum('matic_price')/(10**18)),
-        usdc_volume=(Sum('usdc_price')/(10**18)),
+        usdc_volume=(Sum('usdc_price')/(10**6)),
         weth_volume=(Sum('weth_price')/(10**18)),
         total_sales=(Count('id')),
         total_individual_tokens_sold=Sum("quantity"),
-        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
-        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id')),
-        average_sale_price_per_individual_token=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Sum('quantity', output_field=FloatField()))
+        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
+        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id')),
+        average_sale_price_per_individual_token=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Sum('quantity', output_field=FloatField()))
     )
 
     response = {
@@ -289,24 +289,24 @@ def get_weekly_sales_volume(request):
         week=TruncWeek('tx_hash__dt'),
     ).values('week').annotate(
         matic_volume=(Sum('matic_price')/(10**18)),
-        usdc_volume=(Sum('usdc_price')/(10**18)),
+        usdc_volume=(Sum('usdc_price')/(10**6)),
         weth_volume=(Sum('weth_price')/(10**18)),
         total_sales=(Count('id')),
-        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
-        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id'))
+        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
+        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id'))
     )
 
     weekly_sales_1155 = Seaport1155Transaction.objects.filter(q).annotate(
         week=TruncWeek('tx_hash__dt'),
     ).values('week').annotate(
         matic_volume=(Sum('matic_price')/(10**18)),
-        usdc_volume=(Sum('usdc_price')/(10**18)),
+        usdc_volume=(Sum('usdc_price')/(10**6)),
         weth_volume=(Sum('weth_price')/(10**18)),
         total_sales=(Count('id')),
         total_individual_tokens_sold=Sum("quantity"),
-        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
-        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id')),
-        average_sale_price_per_individual_token=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Sum('quantity', output_field=FloatField()))
+        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
+        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id')),
+        average_sale_price_per_individual_token=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Sum('quantity', output_field=FloatField()))
     )
 
     response = {
@@ -376,24 +376,24 @@ def get_monthly_sales_volume(request):
         month=TruncMonth('tx_hash__dt'),
     ).values('month').annotate(
         matic_volume=(Sum('matic_price')/(10**18)),
-        usdc_volume=(Sum('usdc_price')/(10**18)),
+        usdc_volume=(Sum('usdc_price')/(10**6)),
         weth_volume=(Sum('weth_price')/(10**18)),
         total_sales=(Count('id')),
-        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
-        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id'))
+        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
+        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id'))
     )
 
     monthly_sales_1155 = Seaport1155Transaction.objects.filter(q).annotate(
         month=TruncMonth('tx_hash__dt'),
     ).values('month').annotate(
         matic_volume=(Sum('matic_price')/(10**18)),
-        usdc_volume=(Sum('usdc_price')/(10**18)),
+        usdc_volume=(Sum('usdc_price')/(10**6)),
         weth_volume=(Sum('weth_price')/(10**18)),
         total_sales=(Count('id')),
         total_individual_tokens_sold=Sum("quantity"),
-        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
-        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id')),
-        average_sale_price_per_individual_token=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**18))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Sum('quantity', output_field=FloatField()))
+        spot_usd_volume=((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price),
+        average_sale_price=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Count('id')),
+        average_sale_price_per_individual_token=(((Sum('matic_price', output_field=FloatField())/(10**18))*matic_spot_price) + ((Sum('usdc_price', output_field=FloatField())/(10**6))) + ((Sum('weth_price', output_field=FloatField())/(10**18))*weth_spot_price)) / (Sum('quantity', output_field=FloatField()))
     )
 
     response = {
