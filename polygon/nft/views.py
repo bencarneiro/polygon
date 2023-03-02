@@ -63,6 +63,10 @@ def get_transactions(request):
         "data": response_data,
         'parameters': params
     }
+
+    if "response_type" in request.GET and request.GET['response_type'] == "html":
+        return render(request, "get_transactions.html", response)
+
     return JsonResponse(response)
     
     

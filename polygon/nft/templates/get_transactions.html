@@ -1,0 +1,84 @@
+<html>
+    <h1>Get Transactions of NFT Sales on Polygon</h1>
+
+    <br></br>
+    <br></br>
+
+    <form method="get" action="get_transactions">
+        <label>contract address</label>
+        <input name="contract_address" id="contract_address" type="text"/>
+        <br></br>
+        <label>token_id</label>
+        <input name="token_id" id="token_id" type="text"/>
+        <br></br>
+        <label>start date</label>
+        <input name="start_date" id="start_date" type="date"/>
+        <br></br>
+        <label>end date</label>
+        <input name="end_date" id="end_date" type="date"/>
+        <br></br>
+        <label>buyer</label>
+        <input name="buyer" id="buyer" type="text"/>
+        <br></br>
+        <label>seller</label>
+        <input name="seller" id="seller" type="text"/>
+        <br></br>
+        <label>coin_standard</label>
+        <select name="coin_standard" id="coin_standard"">
+            <option value="all">all</option>
+            <option value="721">ERC721</option>
+            <option value="1155">ERC1155</option>
+        </select>
+        <br></br>
+        <label>response type</label>
+        <select name="response_type" id="response_type">
+            <option value="html">html</option>
+            <option value="json">json</option>
+        </select>
+        <br></br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <br></br>
+    <br></br>
+
+    <p>search parameters for data below </p>
+    <p>
+        {{ parameters }}
+    </p>
+
+    <br></br>
+    <br></br>
+    <table border="1">
+        <tr>
+            <th>Contract Address</th>
+            <th>Token ID</th>
+            <th>Quantity</th>
+            <th>Buyer</th>
+            <th>Seller</th>
+            <th>MATIC Price</th>
+            <th>WETH Price</th>
+            <th>USDC Price</th>
+            <th>TX Hash</th>
+            <th>DateTime</th>
+            <th>Block Number</th>
+            <th>Seaport Function Name</th>
+        </tr>
+            {% for tx in data %}
+            <tr>
+            <td>{{ tx.contract_address }}</td>
+            <td>{{ tx.token_id }}</td>
+            <td>{{ tx.quantity }}</td>
+            <td>{{ tx.buyer }}</td>
+            <td>{{ tx.seller }}</td>
+            <td>{{ tx.matic_price }}</td>
+            <td>{{ tx.weth_price }}</td>
+            <td>{{ tx.usdc_price }}</td>
+            <td>{{ tx.tx_hash }}</td>
+            <td>{{ tx.tx_hash__dt }}</td>
+            <td>{{ tx.tx_hash__block_number }}</td>
+            <td>{{ tx.tx_hash__method_name }}</td>
+            </tr>
+            {% endfor %}
+    </table>
+</html>
