@@ -84,7 +84,10 @@ Explore the dataset and API at 45.33.31.186:8000
 
 ![Screenshot from 2023-03-03 08-49-33](https://user-images.githubusercontent.com/63479105/222765309-5d0fc5fe-677d-4b62-aa77-ef248119cc17.png)
 
+![Screenshot from 2023-03-03 09-14-45](https://user-images.githubusercontent.com/63479105/222771816-aefa67b7-cf41-45b7-a589-d13bb3af9d80.png)
 
-![Screenshot from 2023-03-03 08-46-15](https://user-images.githubusercontent.com/63479105/222765072-28388c7e-08ca-4889-836a-297cb95136cc.png)
+![Screenshot from 2023-03-03 09-17-14](https://user-images.githubusercontent.com/63479105/222771999-0bba5c4c-ecfb-4f63-ba5f-1ec0e4f2c95e.png)
+
+
 
 
