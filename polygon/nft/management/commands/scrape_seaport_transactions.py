@@ -133,59 +133,6 @@ def analyze_volumes(tx, transfers):
 
 
 
-    # for transfer in transfers:
-    #     if transfer['type'] == "ERC721":
-    #         seller = transfer['from']
-    #         print(f"SCANNING FOR BUYER {buyer}")
-    #         print(f"SCANNING FOR SELLER {seller}")
-    #         contract_address = transfer['contract_address']
-    #         token_id = transfer['token_id']
-    #         for tfr in transfers:
-    #             # print(tfr['type'])
-    #             # print(tfr['to'])
-    #             # print(seller)
-    #             # print(tfr['from'])
-    #             # print(SEAPORT_ADDRESS)
-    #             print(tfr)
-    #             tx_to_write = False
-    #             if (tfr['type'] == "MATIC") and (tfr['to'] == seller) and (tfr['from'] == SEAPORT_ADDRESS):
-    #                 # todo this is not working
-    #                 print("MATICMATICMATICMATIC?")
-    #                 matic_price = tfr['amount']
-    #                 usdc_price = 0
-    #                 weth_price = 0
-    #                 spot_price = 0
-    #                 tx_to_write = True
-    #             if (tfr['type'] == "USDC") and (tfr['to'] == seller) and ((tfr['from'] == SEAPORT_ADDRESS) or (tfr['from'] == buyer)):
-    #                 print("YEAH?")
-    #                 matic_price = 0
-    #                 usdc_price = tfr['amount']
-    #                 weth_price = 0
-    #                 spot_price = 0
-    #                 tx_to_write = True
-    #             if (tfr['type'] == "WETH") and (tfr['to'] == seller) and ((tfr['from'] == SEAPORT_ADDRESS) or (tfr['from'] == buyer)):
-    #                 print("YEAH?")
-    #                 matic_price = 0
-    #                 usdc_price = 0
-    #                 weth_price = tfr['amount']
-    #                 spot_price = 0
-    #                 tx_to_write = True
-    #             if tx_to_write:
-    #                 new_721_tx = Seaport721Transaction(
-    #                     tx_hash = tx['hash'],
-    #                     contract_address = contract_address,
-    #                     token_id = token_id,
-    #                     matic_price = matic_price,
-    #                     usdc_price = usdc_price,
-    #                     weth_price = weth_price,
-    #                     spot_price = spot_price,
-    #                     buyer = buyer,
-    #                     seller = seller
-    #                 )
-    #                 new_721_tx.save()
-            
- 
-
 class Command(BaseCommand):
     help = 'Displays current time'
 
