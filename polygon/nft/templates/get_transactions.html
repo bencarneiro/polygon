@@ -53,6 +53,7 @@
             <th>Quantity</th>
             <th>Buyer</th>
             <th>Seller</th>
+            <th>Price in Current USD</th>
             <th>MATIC Price</th>
             <th>WETH Price</th>
             <th>USDC Price</th>
@@ -68,6 +69,7 @@
             <td>{{ tx.quantity }}</td>
             <td>{{ tx.buyer }}</td>
             <td>{{ tx.seller }}</td>
+            <td>{{ tx.spot_usd_price|floatformat:2 }}</td>
             <td>{{ tx.matic_price }}</td>
             <td>{{ tx.weth_price }}</td>
             <td>{{ tx.usdc_price }}</td>
