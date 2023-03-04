@@ -1,11 +1,17 @@
 <html>
     <style>
-        tr {text-align: center;}
+        tr {vertical-align: center;}
+        th {text-align: center;}
         td {text-align: center;}
+        html {background-color: rgb(197, 255, 255); text-align: center; vertical-align: center;}
+        input {margin: 4px;}
+        label {margin: 2px;}
+        table {vertical-align: center; margin-left:auto; margin-right:auto}
         </style>
-    
+
     <h1>Get Volumes for NFT Sales on Polygon</h1>
-    <table>
+    <div style="text-align:center">
+        <table class="center" border="1" style="vertical-align:center;">
     
         <tr>
             <th>MATIC Volume</th>
@@ -40,7 +46,7 @@
             <td>{{ data.average_sale_price_per_individual_token }}</td>
         </tr>
 
-    </table>
+    </table></div>
     <br></br>
     <p>search parameters for data above ^</p>
     <p>
@@ -49,32 +55,32 @@
     <br></br>
 
     <form method="get" action="get_volume">
-        <label>contract address</label>
+        <label>Contract Address</label>
         <input name="contract_address" id="contract_address" type="text"/>
         <br></br>
-        <label>token_id</label>
+        <label>Token ID</label>
         <input name="token_id" id="token_id" type="text"/>
         <br></br>
-        <label>start date</label>
+        <label>Start Date</label>
         <input name="start_dt" id="start_dt" type="date"/>
         <br></br>
-        <label>end date</label>
+        <label>End Date</label>
         <input name="end_dt" id="end_dt" type="date"/>
         <br></br>
-        <label>buyer</label>
+        <label>Buyer</label>
         <input name="buyer" id="buyer" type="text"/>
         <br></br>
-        <label>seller</label>
+        <label>Seller</label>
         <input name="seller" id="seller" type="text"/>
         <br></br>
-        <label>coin_standard</label>
+        <label>Coin Standard</label>
         <select name="coin_standard" id="coin_standard"">
             <option value="all">all</option>
             <option value="721">ERC721</option>
             <option value="1155">ERC1155</option>
         </select>
         <br></br>
-        <label>response type</label>
+        <label>Response Type</label>
         <select name="response_type" id="response_type">
             <option value="html">html</option>
             <option value="json">json</option>

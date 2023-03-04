@@ -1,14 +1,32 @@
 <html>
-    <h1>Get Volumes for NFT Sales on Polygon</h1>
-
-    <a href="get_transactions_page"> Get a log of all Polygon NFTs Sold on Opensea (Granular Data for export)</a>
+    <style>
+        tr {text-align: center;}
+        td {text-align: center;}
+        html {background-color: rgb(197, 255, 255);text-align: center;}
+        input {margin: 4px;}
+        label {margin: 2px;}
+        button {background-color: black; color:rgb(197, 255, 255)}
+        </style>
+    <h1 style="font-size:60px">The "SeaOpener" on Polygon</h1>
     <br></br>
-    <a href="get_volume_page"> Get Total Sales Statistics for a Collection or Address</a>
     <br></br>
-    <a href="get_daily_volume_page"> Get Daily Sales Statistics for a Collection or Address</a>
+    <form action="get_transactions_page">
+    <button type="submit" href="get_transactions_page" style="font-size:55px;">All Transactions</button>
+    </form>
     <br></br>
-    <a href="get_weekly_volume_page"> Get Weekly Sales Statistics for a Collection or Address</a>
-    <br></br>
-    <a href="get_monthly_volume_page"> Get Monthly Sales Statistics for a Collection or Address</a>
-
+    <form action="get_volume_page">
+        <button type="submit" href="get_volume_page" style="font-size:55px;"> Total Trading Volumes</button>
+        </form>
+        <br></br>
+    <form action="get_daily_volume_page">
+        <button type="submit" href="get_daily_volume_page" style="font-size:55px;">Daily Trading Summaries</button>
+        </form>
+        <br></br>
+    <form action="get_weekly_volume_page">
+        <button type="submit" href="get_weekly_volume_page" style="font-size:55px;">Weekly Trading Summaries</button>
+        </form>
+        <br></br>
+    <form action="get_monthly_volume_page">
+        <button type="submit" href="get_monthly_volume_page" style="font-size:55px;">Monthly Trading Summaries</button>
+        </form>
 </html>
