@@ -1,11 +1,11 @@
 from django.shortcuts import render
-from django.db.models import Q, FloatField
+from django.db.models import Q, FloatField, CharField
 from datetime import datetime
 from django.db.models.functions import TruncMonth, TruncDay, TruncYear, TruncWeek
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 from nft.models import SeaportTransaction, Seaport1155Transaction, Seaport721Transaction, SpotPrice
-from django.db.models import Sum, Count, F, ExpressionWrapper
+from django.db.models import Sum, Count, F, ExpressionWrapper, Value
 
 # Create your views here.
 
@@ -57,18 +57,21 @@ def get_transactions(request):
     weth = SpotPrice.objects.get(token_name="WETH")
 
     data721 = Seaport721Transaction.objects.filter(q).annotate(
+        quantity=Value(1),
+        token_standard=Value("ERC721"),
         spot_usd_price= ((ExpressionWrapper(F("matic_price"), output_field=FloatField()) / 10**18) * matic.price) + (ExpressionWrapper(F("usdc_price"), output_field=FloatField()) / 10**6) + ((ExpressionWrapper(F("weth_price"), output_field=FloatField()) / 10**18) * weth.price)
     )
     data1155 = Seaport1155Transaction.objects.filter(q).annotate(
+        token_standard=Value("ERC1155"),
         spot_usd_price= ((ExpressionWrapper(F("matic_price"), output_field=FloatField()) / 10**18) * matic.price) + (ExpressionWrapper(F("usdc_price"), output_field=FloatField()) / 10**6) + ((ExpressionWrapper(F("weth_price"), output_field=FloatField()) / 10**18) * weth.price)
     )
 
     if coin_standard == "all":
-        response_data = list(data721.values("tx_hash", "contract_address", "token_id", "buyer", "seller", "matic_price", "weth_price", "usdc_price", "tx_hash__dt", "tx_hash__block_number", "tx_hash__method_name", "spot_usd_price")) + list(data1155.values("tx_hash", "contract_address", "token_id", "quantity", "buyer", "seller", "matic_price", "weth_price", "usdc_price", "tx_hash__dt", "tx_hash__block_number", "tx_hash__method_name", "spot_usd_price"))
+        response_data = list(data721.values("token_standard", "tx_hash", "contract_address", "token_id", "quantity", "buyer", "seller", "matic_price", "weth_price", "usdc_price", "tx_hash__dt", "tx_hash__block_number", "tx_hash__method_name", "spot_usd_price")) + list(data1155.values("token_standard", "tx_hash", "contract_address", "token_id", "quantity", "buyer", "seller", "matic_price", "weth_price", "usdc_price", "tx_hash__dt", "tx_hash__block_number", "tx_hash__method_name", "spot_usd_price"))
     if coin_standard == "721":
-        response_data = list(data721.values("tx_hash", "contract_address", "token_id", "buyer", "seller", "matic_price", "weth_price", "usdc_price", "tx_hash__dt", "tx_hash__block_number", "tx_hash__method_name", "spot_usd_price"))
+        response_data = list(data721.values("token_standard", "tx_hash", "contract_address", "token_id", "quantity", "buyer", "seller", "matic_price", "weth_price", "usdc_price", "tx_hash__dt", "tx_hash__block_number", "tx_hash__method_name", "spot_usd_price"))
     if coin_standard == "1155":
-        response_data = list(data1155.values("tx_hash", "contract_address", "token_id", "quantity", "buyer", "seller", "matic_price", "weth_price", "usdc_price", "tx_hash__dt", "tx_hash__block_number", "tx_hash__method_name", "spot_usd_price"))
+        response_data = list(data1155.values("token_standard", "tx_hash", "contract_address", "token_id", "quantity", "buyer", "seller", "matic_price", "weth_price", "usdc_price", "tx_hash__dt", "tx_hash__block_number", "tx_hash__method_name", "spot_usd_price"))
     
     response = {
         'length': len(response_data),

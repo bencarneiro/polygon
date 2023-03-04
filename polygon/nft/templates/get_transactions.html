@@ -49,6 +49,7 @@
     <table border="1">
         <tr>
             <th>Contract Address</th>
+            <th>Token Standard</th>
             <th>Token ID</th>
             <th>Quantity</th>
             <th>Buyer</th>
@@ -65,6 +66,7 @@
             {% for tx in data %}
             <tr>
             <td>{{ tx.contract_address }}</td>
+            <td>{{ tx.token_standard  }}</td>
             <td>{{ tx.token_id }}</td>
             <td>{{ tx.quantity }}</td>
             <td>{{ tx.buyer }}</td>
