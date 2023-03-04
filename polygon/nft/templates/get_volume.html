@@ -1,18 +1,23 @@
 <html>
+    <style>
+        tr {text-align: center;}
+        td {text-align: center;}
+        </style>
+    
     <h1>Get Volumes for NFT Sales on Polygon</h1>
     <table>
     
         <tr>
             <th>MATIC Volume</th>
-            <td>{{ data.matic_volume }}</td>
+            <td>{{ data.matic_volume|floatformat:4 }}</td>
         </tr>
         <tr>
             <th>WETH Volume</th>
-            <td>{{ data.weth_volume }}</td>
+            <td>{{ data.weth_volume|floatformat:4 }}</td>
         </tr>
         <tr>
             <th>USDC Volume</th>
-            <td>{{ data.usdc_volume }}</td>
+            <td>{{ data.usdc_volume|floatformat:4 }}</td>
         </tr>
         <tr>
             <th>Total NFT Transactions</th>

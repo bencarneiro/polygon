@@ -1,4 +1,10 @@
 <html>
+    <style>
+    tr {text-align: center;}
+    td {text-align: center;}
+    </style>
+
+
     <h1>Get Transactions of NFT Sales on Polygon</h1>
 
     <br></br>
@@ -48,8 +54,8 @@
     <br></br>
     <table border="1">
         <tr>
-            <th>Contract Address</th>
             <th>Token Standard</th>
+            <th>Contract Address</th>
             <th>Token ID</th>
             <th>Quantity</th>
             <th>Buyer</th>
@@ -65,8 +71,8 @@
         </tr>
             {% for tx in data %}
             <tr>
-            <td>{{ tx.contract_address }}</td>
             <td>{{ tx.token_standard  }}</td>
+            <td>{{ tx.contract_address }}</td>
             <td>{{ tx.token_id }}</td>
             <td>{{ tx.quantity }}</td>
             <td>{{ tx.buyer }}</td>
