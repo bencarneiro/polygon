@@ -20,11 +20,11 @@
         </tr>
         <tr>
             <th>Spot USD Volume</th>
-            <td>{{ data.spot_usd_volume }}</td>
+            <td>{{ data.spot_usd_volume|floatformat:2 }}</td>
         </tr>
         <tr>
             <th>Average Sale Price</th>
-            <td>{{ data.average_sale_price }}</td>
+            <td>{{ data.average_sale_price|floatformat:2 }}</td>
         </tr>
         <tr>
             <th>Total Individual Tokens Sold</th>
